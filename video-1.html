@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Edits | LUNAX</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+    :root {
+      --bg: #05050a;
+      --fg: #e8e8f0;
+      --muted: #6b6b7a;
+      --accent-cyan: #00f5ff;
+      --accent-magenta: #ff00aa;
+      --accent-yellow: #ffee00;
+      --card: #0f0f18;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+      min-height: 100vh;
+      cursor: none;
+    }
+            @media (hover: none) { body { cursor: auto; } .cursor, .cursor-dot { display: none; } }
+
+    .pop-up-section {
+      opacity: 0;
+      transform: translateY(60px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pop-up-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* BG PARTICLE CANVAS */
+    #c {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-gradient {
+      background: radial-gradient(circle at 50% 50%, #071224, rgba(5, 5, 10, 0.205));
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* CURSOR */
+    .cursor {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--accent-cyan);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 999999;
+      transition: transform 0.1s ease, border-color 0.2s ease;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-magenta);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 999999;
+    }
+
+    /* SPARKS */
+    #sparkCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999998;
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+      width: 0%;
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* GLASS CARD */
+    .glass-card {
+      background: rgba(15, 15, 24, 0.253);
+      border: 1px solid rgba(232, 232, 240, 0.08);
+      backdrop-filter: blur(12px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(0, 245, 255, 0.3);
+      transform: translateY(-4px);
+    }
+
+    h1,
+    h2 {
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+    }
+
+    /* ── HERO ── */
+    .hero-wrap {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 0 1.5rem;
+    }
+
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      max-width: 860px;
+    }
+
+    /* Film strip decorative lines */
+    .film-strip {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px 0;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .film-strip.left {
+      left: 2rem;
+    }
+
+    .film-strip.right {
+      right: 2rem;
+    }
+
+    .film-hole {
+      width: 12px;
+      height: 18px;
+      border-radius: 3px;
+      background: var(--accent-cyan);
+      margin: auto;
+      flex-shrink: 0;
+    }
+
+    @media(max-width: 768px) {
+      .film-strip {
+        display: none;
+      }
+    }
+
+    /* Animated scan line */
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0.25;
+      z-index: 5;
+      pointer-events: none;
+      animation: scan 4s linear infinite;
+    }
+
+    @keyframes scan {
+      0% {
+        top: 0%
+      }
+
+      100% {
+        top: 100%
+      }
+    }
+
+    /* Hero floating HUD badges */
+    .hud-badge {
+      position: absolute;
+      z-index: 10;
+      font-family: monospace;
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      line-height: 1.8;
+    }
+
+    .hud-badge.tl {
+      top: 22%;
+      left: 4rem;
+      color: rgba(0, 245, 255, 0.45);
+    }
+
+    .hud-badge.tr {
+      top: 22%;
+      right: 4rem;
+      text-align: right;
+      color: rgba(255, 0, 170, 0.45);
+    }
+
+    @media(max-width: 1024px) {
+      .hud-badge {
+        display: none;
+      }
+    }
+
+    /* Scroll cue */
+    .scroll-cue {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.5;
+    }
+
+    .scroll-cue span {
+      font-size: 0.55rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: monospace;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(to bottom, var(--accent-cyan), transparent);
+      animation: scrlp 2s infinite;
+    }
+
+    @keyframes scrlp {
+      0% {
+        transform: scaleY(0);
+        transform-origin: top;
+        opacity: 1
+      }
+
+      100% {
+        transform: scaleY(1);
+        transform-origin: top;
+        opacity: 0
+      }
+    }
+
+    /* ── VIDEO SECTION ── */
+    .video-section-wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 6rem;
+    }
+
+    /* VIDEO GRID */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 1200px) {
+      .video-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .video-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* CARD */
+    .vid-card {
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--card);
+      border: 1px solid rgba(232, 232, 240, 0.07);
+      aspect-ratio: 9/16;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease;
+    }
+
+    .vid-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: rgba(0, 245, 255, 0.4);
+      box-shadow: 0 20px 60px rgba(0, 245, 255, 0.12), 0 0 0 1px rgba(0, 245, 255, 0.08);
+    }
+
+    .vid-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 1rem;
+      box-shadow: inset 0 0 0 1px rgba(0, 245, 255, 0);
+      transition: box-shadow 0.4s ease;
+      pointer-events: none;
+    }
+
+    .vid-card:hover::after {
+      box-shadow: inset 0 0 0 1px rgba(0, 245, 255, 0.2);
+    }
+
+    .vid-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease, filter 0.4s ease;
+    }
+
+    .vid-card:hover .vid-thumb {
+      transform: scale(1.07);
+      filter: brightness(0.42);
+    }
+
+    .vid-grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5, 5, 10, 0.96) 0%, rgba(5, 5, 10, 0.3) 45%, rgba(5, 5, 10, 0.08) 100%);
+    }
+
+    .vid-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(0, 245, 255, 0.12);
+      border: 1.5px solid rgba(0, 245, 255, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(8px);
+    }
+
+    .vid-play svg {
+      color: var(--accent-cyan);
+      margin-left: 3px;
+    }
+
+    .vid-card:hover .vid-play {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .vid-tag {
+      position: absolute;
+      top: 0.65rem;
+      left: 0.65rem;
+      font-size: 0.52rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 100px;
+      background: rgba(5, 5, 10, 0.75);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 0, 170, 0.4);
+      color: var(--accent-magenta);
+    }
+
+    .vid-views {
+      position: absolute;
+      top: 0.65rem;
+      right: 0.65rem;
+      font-size: 0.52rem;
+      letter-spacing: 1px;
+      font-family: monospace;
+      color: rgba(255, 238, 0, 0.75);
+      background: rgba(5, 5, 10, 0.7);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 238, 0, 0.2);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    .vid-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.8rem;
+    }
+
+    .vid-title {
+      font-size: clamp(0.68rem, 1.1vw, 0.82rem);
+      font-weight: 700;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+      margin-bottom: 0.22rem;
+      line-height: 1.2;
+    }
+
+    .vid-desc {
+      font-size: clamp(0.52rem, 0.8vw, 0.65rem);
+      color: rgba(107, 107, 122, 0.9);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .vid-num {
+      position: absolute;
+      bottom: 0.65rem;
+      right: 0.65rem;
+      font-family: monospace;
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      color: rgba(0, 245, 255, 0.2);
+    }
+
+    /* MODAL */
+    .vm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200000;
+      background: rgba(5, 5, 10, 0.9);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s ease;
+    }
+
+    .vm-overlay.is-open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .vm-modal {
+      position: relative;
+      width: 100%;
+      max-width: 880px;
+      background: rgba(10, 10, 20, 0.92);
+      border: 1px solid rgba(0, 245, 255, 0.14);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 40px 100px rgba(0, 0, 0, 0.75), 0 0 90px rgba(0, 245, 255, 0.06);
+      transform: translateY(28px) scale(0.95);
+      transition: transform 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .vm-overlay.is-open .vm-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .vm-modal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      border-radius: 1.5rem 1.5rem 0 0;
+      background: linear-gradient(90deg, #00f5ff, #ff00aa, #ffee00, #00f5ff);
+      background-size: 200% 100%;
+      animation: vmgrad 3s linear infinite;
+    }
+
+    @keyframes vmgrad {
+      0% {
+        background-position: 0%
+      }
+
+      100% {
+        background-position: 200%
+      }
+    }
+
+    .vm-video-wrap {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+    }
+
+    .vm-video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .vm-scanlines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 245, 255, 0.015) 2px, rgba(0, 245, 255, 0.015) 4px);
+    }
+
+    .vm-info {
+      padding: 1.1rem 1.4rem 1.3rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .vm-info-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .vm-modal-tag {
+      display: inline-block;
+      font-size: 0.58rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent-magenta);
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .vm-modal-title {
+      font-size: clamp(1.05rem, 3vw, 1.45rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--fg);
+      line-height: 1.15;
+      margin-bottom: 0.35rem;
+    }
+
+    .vm-modal-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .vm-close {
+      position: absolute;
+      top: 0.9rem;
+      right: 0.9rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(232, 232, 240, 0.12);
+      background: rgba(232, 232, 240, 0.06);
+      color: var(--muted);
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.22s ease;
+      z-index: 10;
+    }
+
+    .vm-close:hover {
+      background: rgba(255, 0, 170, 0.15);
+      border-color: rgba(255, 0, 170, 0.4);
+      color: var(--accent-magenta);
+      transform: rotate(90deg);
+    }
+
+    .vm-nav {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .vm-nav-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(232, 232, 240, 0.12);
+      background: rgba(232, 232, 240, 0.05);
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .vm-nav-btn:hover {
+      border-color: rgba(0, 245, 255, 0.4);
+      background: rgba(0, 245, 255, 0.08);
+      color: var(--accent-cyan);
+    }
+
+    .vm-counter {
+      font-family: monospace;
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      color: #2e2e40;
+      padding: 0 0.2rem;
+      white-space: nowrap;
+    }
+
+    /* FOOTER */
+    .pop-up-section {
+      opacity: 0;
+      transform: translateY(60px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pop-up-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LAYER 0: BG particles -->
+  <canvas id="c"></canvas>
+  <!-- LAYER 1: glow -->
+  <div class="glow-gradient"></div>
+  <!-- CURSOR + FX -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+  <canvas id="sparkCanvas"></canvas>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- NAV -->
+  <nav class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl" style="z-index:9999">
+    <div
+      class="glass-card px-6 py-2.5 rounded-full flex justify-between items-center text-sm font-medium text-[#6b6b7a]">
+      <a href="index.html" class="hover:text-[#e8e8f0] transition-colors">← Back</a>
+      <div class="flex gap-6">
+        <a href="#edits" class="hover:text-[#e8e8f0] transition-colors">Edits</a>
+      </div>
+      <a href="index.html#contact"
+        class="text-[#05050a] bg-[#00f5ff] px-3 py-1 rounded-full hover:bg-[#ff00aa] hover:text-[#e8e8f0] transition-all font-bold whitespace-nowrap cursor-pointer border-0 text-xs">Hire
+        Me</a>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ════════════════════════════════════════════════════════ -->
+  <div class="pop-up-section hero-wrap">
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Film strip decorations -->
+    <div class="film-strip left">
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+    </div>
+    <div class="film-strip right">
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+      <div class="film-hole"></div>
+    </div>
+
+    <!-- Scan line -->
+    <div class="scan-line"></div>
+
+    <!-- HUD badges -->
+    <div class="hud-badge tl">
+      FORMAT: 4K/8K<br>
+      FPS: 24 / 60<br>
+      GRADE: DAVINCI
+    </div>
+    <div class="hud-badge tr">
+      CUTS: 10+ PIECES<br>
+      VIEWS: 3M+ TOTAL<br>
+      STATUS: OPEN
+    </div>
+
+    <!-- Main content -->
+    <div class="hero-content px-4">
+      <!-- Eyebrow badge -->
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#00f5ff]/30 bg-[#00f5ff]/5 text-xs text-[#00f5ff] mb-8 uppercase tracking-widest font-semibold">
+        <span class="w-2 h-2 rounded-full bg-[#ff00aa] animate-pulse"></span>
+        Motion · Cuts · Colour Grade
+      </div>
+
+      <!-- Headline -->
+      <h1 class="text-6xl md:text-9xl font-bold mb-6">
+        <span class="bg-clip-text text-transparent bg-gradient-to-b from-[#e8e8f0] to-[#6b6b7a]">VIDEO</span><br>
+        <span
+          style="background: linear-gradient(135deg,#00f5ff,#ff00aa,#ffee00); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">EDITING.</span>
+      </h1>
+
+      <!-- Subline -->
+      <p class="text-base md:text-xl text-[#6b6b7a] max-w-lg mx-auto leading-relaxed mb-10">
+        From raw footage to powerful storytelling, we transform moments into motion.
+        Cinematic edits built to inspire, engage, and convert.
+
+      </p>
+
+      <!-- Stat pills row -->
+      <!-- <div class="flex flex-wrap justify-center gap-3 mb-10">
+        <div class="glass-card px-4 py-2 rounded-full text-xs font-mono text-[#00f5ff]">
+          <span class="opacity-50 mr-1">//</span> 10+ PIECES
+        </div>
+        <div class="glass-card px-4 py-2 rounded-full text-xs font-mono text-[#ff00aa]">
+          <span class="opacity-50 mr-1">//</span> 3M+ VIEWS
+        </div>
+        <div class="glass-card px-4 py-2 rounded-full text-xs font-mono text-[#ffee00]">
+          <span class="opacity-50 mr-1">//</span> 4K · 8K · ANAMORPHIC
+        </div>
+        <div class="glass-card px-4 py-2 rounded-full text-xs font-mono text-[#e8e8f0]/60">
+          <span class="opacity-50 mr-1">//</span> DAVINCI RESOLVE
+        </div>
+      </div> -->
+
+      <!-- CTA -->
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="#edits"
+          class="px-6 py-3 bg-[#e8e8f0] text-[#05050a] font-bold rounded-full hover:bg-[#00f5ff] transition-colors text-sm">Watch
+          the Cuts</a>
+        <a href="index.html"
+          class="px-6 py-3 border border-[#e8e8f0]/20 hover:bg-[#e8e8f0]/5 rounded-full font-medium transition-colors text-[#e8e8f0] text-sm">Back
+          to Portfolio</a>
+      </div>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="scroll-cue">
+      <span style="color: transparent;" >Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+  <!-- ══ END HERO ══════════════════════════════════════════════════ -->
+
+  <!-- VIDEO GRID SECTION -->
+  <section class="pop-up-section video-section-wrap" id="edits">
+    <div
+      class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 border-b border-[#e8e8f0]/10 pb-6 md:pb-8 gap-4">
+      <h2
+        class="text-3xl md:text-5xl font-bold display-font bg-clip-text text-transparent bg-gradient-to-b from-[#e8e8f0] to-[#6b6b7a]">
+        Video<br>Edit</h2>
+      <p class="text-[#6b6b7a] max-w-sm md:text-right text-sm md:text-base">Motion pieces &amp; edits — click any card
+        to watch.</p>
+    </div>
+    <div class="video-grid" id="videoGrid"></div>
+  </section>
+
+  <!-- MODAL -->
+  <div class="vm-overlay" id="vmOverlay" role="dialog" aria-modal="true">
+    <div class="vm-modal">
+      <button class="vm-close" id="vmClose">✕</button>
+      <div class="vm-video-wrap">
+        <div class="vm-scanlines"></div>
+        <iframe id="vmFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <div class="vm-info">
+        <div class="vm-info-left">
+          <span class="vm-modal-tag" id="vmTag"></span>
+          <div class="vm-modal-title" id="vmTitle"></div>
+          <div class="vm-modal-desc" id="vmDesc"></div>
+        </div>
+        <div class="vm-nav">
+          <button class="vm-nav-btn" id="vmPrev">&#8249;</button>
+          <span class="vm-counter" id="vmCounter">1 / 10</span>
+          <button class="vm-nav-btn" id="vmNext">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- CTA -->
+  <!-- <section class="pop-up-section relative z-10 max-w-4xl mx-auto px-4 pb-20 md:pb-32 text-center">
+        <div class="cta-wrap">
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-full bg-gradient-to-b from-[#00f5ff]/5 to-transparent pointer-events-none rounded-2xl"></div>
+            <span class="text-[0.65rem] tracking-[3px] uppercase font-semibold text-[#ff00aa] font-mono block mb-4">// READY TO SCALE?</span>
+            <h2 class="text-3xl md:text-5xl font-bold display-font bg-clip-text text-transparent bg-gradient-to-b from-[#e8e8f0] to-[#6b6b7a]">Let's build your<br>empire.</h2>
+            <p class="text-base md:text-xl text-[#6b6b7a] mb-10 max-w-lg mx-auto">One partner, every platform. Let's get your brand selling across all 9 marketplaces.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="index.html" onclick="event.preventDefault(); window.history.back();" class="px-8 py-4 bg-[#e8e8f0] text-[#05050a] font-bold rounded-full hover:bg-[#00f5ff] transition-colors cursor-pointer text-sm">Book a Call</a>
+                <a href="index.html" class="px-8 py-4 border border-[#e8e8f0]/20 hover:bg-[#e8e8f0]/5 rounded-full font-medium transition-colors text-[#e8e8f0] text-sm">Back to Portfolio</a> 
+                <a href="index.html#contact"  class="text-text-[#e8e8f0] bg-[#ff00aa] rounded-3xl hover:bg-[#00f5ff] hover:text-[#05050a] transition-all font-bold text-sm whitespace-nowrap cursor-pointer border-0 text-xs px-8 py-3 ">Let's Connect</a>
+            </div>
+        </div> -->
+
+  <!-- FOOTER -->
+  <footer class="pop-up-section relative z-10 w-full pb-12 pt-12">
+    <div class="w-[90%] mx-auto">
+      <div class="glass-card rounded-[2rem] p-8 md:p-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-2 text-xl font-bold text-[#e8e8f0]">
+              <!-- <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#00f5ff] to-[#ff00aa] flex items-center justify-center text-black text-xs font-bold">W</div>
+                            <span>Winter.</span> -->
+              <img src="assets/m-logo.png" alt="" style="width: 70px;" height="auto">
+            </div>
+            <p class="text-sm text-[#6b6b7a]">Building AI-powered solutions that drive limitless growth, helping brands
+              succeed in the ever evolving digital world.</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-[#e8e8f0] mb-4">Services</h4>
+            <ul class="space-y-2 text-sm text-[#6b6b7a]">
+              <li><a href="/" class="hover:text-[#00f5ff] transition-colors">Home</a></li>
+              <li><a href="/ecommerce-1.html" class="hover:text-[#00f5ff] transition-colors">E-Commerce</a></li>
+              <li><a href="/video-1.html" class="hover:text-[#00f5ff] transition-colors">Video Editing</a></li>
+              <li><a href="/graphic-design.html" class="hover:text-[#00f5ff] transition-colors">Graphic Designing</a>
+              </li>
+              <li><a href="/marketing.html" class="hover:text-[#00f5ff] transition-colors">Digital Marketing</a></li>
+              <li><a href="/webdev.html" class="hover:text-[#00f5ff] transition-colors">Website Development </a></li>
+            </ul>
+          </div>
+
+
+          <div>
+            <h4 class="font-semibold text-[#e8e8f0] mb-4">Social Media</h4>
+            <ul class="space-y-2 text-sm text-[#6b6b7a]">
+              <li><a href="https://www.linkedin.com/company/lunax-marketing/" class="hover:text-[#00f5ff] transition-colors">Linkdin</a></li>
+              <li><a href="https://www.instagram.com/lunaxmarketing.official/" class="hover:text-[#00f5ff] transition-colors">Instagram</a></li>
+              <li><a href="https://www.facebook.com/profile.php?id=61574238251129" class="hover:text-[#00f5ff] transition-colors">Facebook</a></li>
+              <li><a href="https://www.tiktok.com/@lunaxmarketing.official?lang=en-GB" class="hover:text-[#00f5ff] transition-colors">TikTok</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-[#e8e8f0] mb-4">Contact</h4>
+            <div class="space-y-2 text-sm text-[#6b6b7a]">
+              <p>Johar Town, Lahore<br>Pakistan</p>
+               <p>
+  <a href="mailto:info@lunaxmarketing.com?subject=Inquiry&body=Hello, I want to ask about..."
+     class="hover:text-[#00f5ff] transition-colors">
+    info@lunaxmarketing.com
+  </a>
+</p>
+              <p><a href="tel:+923003588762" class="hover:text-[#00f5ff] transition-colors">+92 300-3588762</a></p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-[#e8e8f0]/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-[#6b6b7a]">
+          <p>&copy; 2026 LUNAX MARKETING. Built for performance. All rights reserved.</p>
+          <div class="flex gap-4 mt-4 md:mt-0">
+            <a href="/privacy-policy" class="hover:text-[#00f5ff]">Privacy Policy</a>
+            <a href="/terms" class="hover:text-[#00f5ff]">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+
+    // ===== POP-UP SECTIONS =====
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+        else entry.target.classList.remove('is-visible');
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+    document.querySelectorAll('.pop-up-section').forEach(s => observer.observe(s));
+    // ── BG PARTICLES (Three.js, canvas #c) ──────────────────────────
+    (function () {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: true });
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      camera.position.z = 3.5;
+
+      const pos = new Float32Array(300 * 3);
+      for (let i = 0; i < pos.length; i++) pos[i] = (Math.random() - .5) * 5;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      const pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: .015, color: 0xffee00, transparent: true, opacity: .6 }));
+      scene.add(pts);
+
+      window.addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+      (function loop() { requestAnimationFrame(loop); pts.rotation.y += .0005; pts.rotation.x += .0002; renderer.render(scene, camera); })();
+    })();
+
+    // ── HERO CANVAS (Three.js, #hero-canvas) — film reel waveform ──
+    (function () {
+      const cv = document.getElementById('hero-canvas');
+      const sc = new THREE.Scene();
+      const cam = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, .1, 1000);
+      const rnd = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+      rnd.setSize(innerWidth, innerHeight);
+      rnd.setPixelRatio(Math.min(devicePixelRatio, 2));
+      cam.position.z = 7;
+
+      const grp = new THREE.Group();
+      sc.add(grp);
+
+      // Waveform ring — represents audio/video waveform
+      const ringCount = 5;
+      const rings = [];
+      for (let r = 0; r < ringCount; r++) {
+        const pts = 180;
+        const pos = new Float32Array(pts * 3);
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        const mat = new THREE.LineBasicMaterial({
+          color: [0x00f5ff, 0xff00aa, 0xffee00, 0x00f5ff, 0xff00aa][r],
+          transparent: true, opacity: .12 + r * .04
+        });
+        const line = new THREE.LineLoop(geo, mat);
+        grp.add(line);
+        rings.push({ geo, pts, radius: 1.5 + r * .55, speed: .3 + r * .15, phase: r * 1.2 });
+      }
+
+      // Central icosahedron (film reel feel)
+      const iw = new THREE.LineSegments(
+        new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(1, 2)),
+        new THREE.LineBasicMaterial({ color: 0x00f5ff, transparent: true, opacity: .15 })
+      );
+      grp.add(iw);
+
+      // Orbiting film frames — small rectangles
+      const frameCount = 8;
+      const frames = [];
+      for (let f = 0; f < frameCount; f++) {
+        const geo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(.3, .42));
+        const mat = new THREE.LineBasicMaterial({ color: 0x00f5ff, transparent: true, opacity: .25 });
+        const mesh = new THREE.LineSegments(geo, mat);
+        grp.add(mesh);
+        frames.push({ mesh, angle: (f / frameCount) * Math.PI * 2, r: 3.2 + Math.sin(f) * 0.4, speed: .006 + f * .0005 });
+      }
+
+      // Stars
+      const stPos = new Float32Array(600 * 3);
+      for (let i = 0; i < stPos.length; i++) stPos[i] = (Math.random() - .5) * 20;
+      const stGeo = new THREE.BufferGeometry();
+      stGeo.setAttribute('position', new THREE.BufferAttribute(stPos, 3));
+      sc.add(new THREE.Points(stGeo, new THREE.PointsMaterial({ size: .022, color: 0xffffff, transparent: true, opacity: .18 })));
+
+      window.addEventListener('resize', () => { cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); rnd.setSize(innerWidth, innerHeight); });
+
+      let t = 0;
+      (function loop() {
+        requestAnimationFrame(loop); t += .012;
+        iw.rotation.y += .003; iw.rotation.x += .001;
+        grp.rotation.y += .0006;
+
+        // Animate waveform rings
+        rings.forEach((ring, i) => {
+          const pos = ring.geo.attributes.position;
+          for (let p = 0; p < ring.pts; p++) {
+            const a = (p / ring.pts) * Math.PI * 2;
+            const wave = Math.sin(a * 6 + t * ring.speed + ring.phase) * (.18 + i * .06);
+            pos.setXYZ(p,
+              Math.cos(a) * (ring.radius + wave),
+              Math.sin(a) * (ring.radius + wave),
+              Math.sin(a * 3 + t) * (.2 + i * .05)
+            );
+          }
+          pos.needsUpdate = true;
+        });
+
+        // Orbit film frames
+        frames.forEach(f => {
+          f.angle += f.speed;
+          f.mesh.position.set(Math.cos(f.angle) * f.r, Math.sin(f.angle * .5) * 1.2, Math.sin(f.angle) * f.r * .3);
+          f.mesh.rotation.z = f.angle;
+        });
+
+        rnd.render(sc, cam);
+      })();
+    })();
+
+    // ── VIDEO CARDS ──────────────────────────────────────────────────
+    (function () {
+      const VIDEOS = [
+      { title: 'Quick Day Recap', desc: 'Little snippets that make life unforgettable.', tag: 'AI', youtubeId: 'pOnL23Lr8l0', thumb: 'assets/videos/moltai.webp' },  
+      { title: 'The Ultimate Family Guy Episode Recap', desc: 'Crazy jokes, wild cutaways, and Peter’s funniest moments in one quick recap.', tag: 'Show', youtubeId: 'x3G37PsqvUs', thumb: 'assets/videos/family-guy.webp' },
+        { title: 'From Zero to Hero: The Ultimate Manga Story Recap', desc: 'From humble beginnings to world-changing battles.', tag: 'Manga', youtubeId: 'JOfTBpj9OV0', thumb: 'assets/videos/anderson.webp' },
+        { title: 'Justice for Hire', desc: 'He protects the weak—but only if they pay.', tag: 'Manhwa', youtubeId: '_yMjYAc-dyY', thumb: 'assets/videos/rental-hero.webp' },
+        { title: 'The Rise of Chaos', desc: 'New technology sparks ambition, corruption, and destruction.', tag: 'Anime', youtubeId: 'X_7ASzix434', thumb: 'assets/videos/arcane.webp' },
+        { title: 'The God of the New World', desc: 'A brilliant mind tries to create a new world by killing criminals.', tag: 'Anime', youtubeId: 'r1GzEJXn5b8', thumb: 'assets/videos/death-note.webp' },
+        { title: 'Hit Monkey', desc: 'One monkey silently eliminates powerful criminals across the city.', tag: 'Anime', youtubeId: 'B0Kh-SXWwIw', thumb: 'assets/videos/hit-monkey.webp' },
+        { title: 'Toxic Marriage Thriller', desc: 'A seemingly perfect couple hides murder, jealousy, and obsession.', tag: 'Movie', youtubeId: '26Rv7WYPK98', thumb: 'assets/videos/deep-water.webp' },
+        { title: 'Goku Unleashed', desc: 'Watch Goku go full power in epic action moments.', tag: 'Short', youtubeId: 'asTTlEvXH98', thumb: 'assets/videos/goku-short.webp' },
+        { title: 'Image Blending', desc: 'One simple Nano Banana Pro trick that completely changes how you use it.', tag: 'Short', youtubeId: '-e3_70NHDw8', thumb: 'assets/videos/img-blend.webp' },
+        { title: 'Nano Banana Pro', desc: '4 websites where you can use Nano Banana Pro for free.', tag: 'Short', youtubeId: 'sXqd3YHBPas', thumb: 'assets/videos/nano-banana.webp' },
+          { title: 'Google’s New AI Is Crazy', desc: 'Google just released a powerful new AI and it’s blowing everyone’s mind..', tag: 'Short', youtubeId: 'zQ0wY-zOSBk', thumb: 'assets/videos/googel-ai.webp' },
+        { title: 'Fast & Fun Vlog', desc: "A tiny slice of my life, all in one clip.", tag: 'Mini vlog', youtubeId: '934eZS4eG20', thumb: 'assets/videos/mini-vlog.webp' },
+        { title: 'Quick Day Recap', desc: 'Little snippets that make life unforgettable.', tag: 'Mini vlog', youtubeId: '2Bwyes-aE1M', thumb: 'assets/videos/daily-mini-vlog.webp' },
+          { title: 'Stop Paying for AI', desc: 'Use these free tools and stop wasting money on AI.', tag: 'ai', youtubeId: 'laTWLX2-fbg', thumb: 'assets/videos/stop-pay.webp' },
+      ];
+
+      const grid = document.getElementById('videoGrid');
+      VIDEOS.forEach((v, i) => {
+        const card = document.createElement('div');
+        card.className = 'vid-card'; card.setAttribute('tabindex', '0');
+        card.innerHTML = `
+          <img class="vid-thumb" src="${v.thumb}" alt="${v.title}" loading="lazy">
+          <div class="vid-grad"></div>
+          <span class="vid-tag">${v.tag}</span>
+       
+          <div class="vid-play">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <div class="vid-info">
+            <div class="vid-title">${v.title}</div>
+            <div class="vid-desc">${v.desc}</div>
+          </div>
+          <span class="vid-num">${String(i + 1).padStart(2, '0')}</span>`;
+        card.addEventListener('click', () => openModal(i));
+        card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(i); });
+        grid.appendChild(card);
+      });
+
+      const overlay = document.getElementById('vmOverlay');
+      const frame = document.getElementById('vmFrame');
+      let cur = 0;
+
+      function openModal(i) { cur = i; loadVideo(i); overlay.classList.add('is-open'); document.body.style.overflow = 'hidden'; }
+      function closeModal() { overlay.classList.remove('is-open'); document.body.style.overflow = ''; frame.src = ''; }
+      function loadVideo(i) {
+        const v = VIDEOS[i];
+        frame.src = `https://www.youtube.com/embed/${v.youtubeId}?autoplay=1&rel=0&modestbranding=1`;
+        document.getElementById('vmTag').textContent = v.tag;
+        document.getElementById('vmTitle').textContent = v.title;
+        document.getElementById('vmDesc').textContent = v.desc;
+        document.getElementById('vmCounter').textContent = `${i + 1} / ${VIDEOS.length}`;
+      }
+      function nav(d) { frame.src = ''; cur = (cur + d + VIDEOS.length) % VIDEOS.length; setTimeout(() => loadVideo(cur), 100); }
+
+      document.getElementById('vmClose').addEventListener('click', closeModal);
+      document.getElementById('vmPrev').addEventListener('click', () => nav(-1));
+      document.getElementById('vmNext').addEventListener('click', () => nav(1));
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+      document.addEventListener('keydown', e => {
+        if (!overlay.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowRight') nav(1);
+        if (e.key === 'ArrowLeft') nav(-1);
+      });
+    })();
+
+    // ── CURSOR ────────────────────────────────────────────────────────
+    const cursorEl = document.getElementById('cursor'), cursorDot = document.getElementById('cursorDot');
+    let cX = 0, cY = 0, dX = 0, dY = 0;
+    document.addEventListener('mousemove', e => { cX = e.clientX; cY = e.clientY; });
+    (function loop() { dX += (cX - dX) * .15; dY += (cY - dY) * .15; cursorEl.style.left = (cX - 10) + 'px'; cursorEl.style.top = (cY - 10) + 'px'; cursorDot.style.left = (dX - 3) + 'px'; cursorDot.style.top = (dY - 3) + 'px'; requestAnimationFrame(loop); })();
+
+    // ── SPARKS ────────────────────────────────────────────────────────
+    const sc2 = document.getElementById('sparkCanvas'), ctx2 = sc2.getContext('2d');
+    let sparks = [];
+    const cols = ['#00f5ff', '#ff00aa', '#ffee00'];
+    function rsz() { sc2.width = innerWidth; sc2.height = innerHeight; } rsz(); addEventListener('resize', rsz);
+    class Sp { constructor(x, y) { this.x = x; this.y = y; const a = Math.random() * Math.PI * 2, s = Math.random() * 8 + 4; this.vx = Math.cos(a) * s; this.vy = Math.sin(a) * s; this.l = 1; this.d = Math.random() * .03 + .02; this.c = cols[Math.floor(Math.random() * cols.length)]; this.sz = Math.random() * 4 + 2; } update() { this.x += this.vx; this.y += this.vy; this.vy += .15; this.vx *= .98; this.vy *= .98; this.l -= this.d; } draw() { if (this.l <= 0) return; ctx2.save(); ctx2.globalAlpha = this.l; ctx2.fillStyle = this.c; ctx2.shadowBlur = 15; ctx2.shadowColor = this.c; ctx2.beginPath(); ctx2.arc(this.x, this.y, Math.max(.1, this.sz * this.l), 0, Math.PI * 2); ctx2.fill(); ctx2.restore(); } }
+    (function loop() { ctx2.clearRect(0, 0, sc2.width, sc2.height); sparks = sparks.filter(s => s.l > 0); sparks.forEach(s => { s.update(); s.draw(); }); requestAnimationFrame(loop); })();
+    document.addEventListener('click', e=>{ 
+  const count = window.innerWidth <= 768 ? 10 : 40;
+  for(let i=0;i<count;i++) sparks.push(new Sp(e.clientX,e.clientY)); 
+});
+
+    // ── PROGRESS BAR ─────────────────────────────────────────────────
+    const pb = document.getElementById('progressBar');
+    addEventListener('scroll', () => { pb.style.width = (scrollY / (document.documentElement.scrollHeight - innerHeight) * 100) + '%'; });
+
+    // ── FOOTER REVEAL ────────────────────────────────────────────────
+    const ro = new IntersectionObserver(e => { e.forEach(en => { if (en.isIntersecting) en.target.classList.add('is-visible'); }); }, { threshold: .1 });
+    document.querySelectorAll('.pop-up-section').forEach(el => ro.observe(el));
+  </script>
+</body>
+
+</html>
