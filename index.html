@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LUNAX Marketing: AI-driven e-commerce growth, digital marketing, website development, graphic design and video editing.">
+    <meta name="theme-color" content="#05050a">
     <title>LUNAX</title>
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        
         :root {
             --bg: #05050a;
             --fg: #e8e8f0;
@@ -21,8 +24,10 @@
             --mid-night:#071224;
         }
 
+        html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--fg); overflow-x: hidden; cursor: none; }
         @media (hover: none) { body { cursor: auto; } .cursor, .cursor-dot { display: none; } }
+        #work, #about, #reviews, #contact { scroll-margin-top: 6rem; }
 
         .pop-up-section { opacity: 0; transform: translateY(60px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .pop-up-section.is-visible { opacity: 1; transform: translateY(0); }
@@ -33,19 +38,40 @@
         #sparkCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999998; }
         .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta)); width: 0%; z-index: 9999; transition: width 0.1s linear; }
 
+        /* ===== HERO ===== */
         .hero-scroll-container { height: 300vh; position: relative; }
-        .hero-sticky-wrapper { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #globe-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-       
+        .hero-sticky-wrapper { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; touch-action: pan-y pinch-zoom; }
+        #globe-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; z-index: 1; pointer-events: none; }
         .hero-content { position: relative; z-index: 10; text-align: center; transition: opacity 0.5s ease, transform 0.5s ease; }
 
+        #hero-logo, #hero-logo-mobile { pointer-events: none; }
+        #hero-logo-mobile { display: none; position: absolute; top: 6.5rem; left: 50%; transform: translateX(-50%); width: 80px; height: auto; z-index: 11; }
+        @media (max-width: 950px) {
+            #hero-logo { display: none; }
+            #hero-logo-mobile { display: block; }
+        }
+        @media (max-width: 950px) and (max-height: 520px) { #hero-logo-mobile { display: none; } }
+
+        /* Mobile: shorter scroll story, same globe animation as desktop */
+        @media (max-width: 980px) { .hero-scroll-container { height: 220vh; } }
+        @media (max-width: 767px) { #animated-heading { font-size: clamp(2.1rem, 10.5vw, 3rem); } }
+
+        .globe-hint { display: none; justify-content: center; align-items: center; gap: 0.6rem; margin-top: -0.75rem; font-size: 0.72rem; letter-spacing: 0.08em; color: rgba(0,245,255,0.7); transition: opacity 0.6s ease; }
+        .globe-hint i { font-style: normal; display: inline-block; }
+        .globe-hint i:first-child { animation: nudgeL 1.8s ease-in-out infinite; }
+        .globe-hint i:last-child { animation: nudgeR 1.8s ease-in-out infinite; }
+        .globe-hint.is-hidden { opacity: 0; }
+        @keyframes nudgeL { 0%,100% { transform: translateX(0); } 50% { transform: translateX(-5px); } }
+        @keyframes nudgeR { 0%,100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+        @media (hover: none) { .globe-hint { display: flex; } }
+
         .glow-gradient { background: radial-gradient(circle at 50% 50%, #071224, rgba(5, 5, 10, 0.205)); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; }
-        .glass-card { background: rgba(15, 15, 24, 0.253); border: 1px solid rgba(232, 232, 240, 0.08); backdrop-filter: blur(12px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .glass-card:hover { border-color: rgba(0, 245, 255, 0.3); transform: translateY(-4px);  }
-.carousel-btn:hover {
-    transform: translateY(-50%) !important;
-    border-color: rgba(0, 245, 255, 0.3);
-}
+        .glass-card { background: rgba(15, 15, 24, 0.253); border: 1px solid rgba(232, 232, 240, 0.08); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Hover lift only on real pointers, so cards don't stay "stuck" up after a tap on phones */
+        @media (hover: hover) {
+            .glass-card:hover { border-color: rgba(0, 245, 255, 0.3); transform: translateY(-4px); }
+            .carousel-btn:hover { transform: translateY(-50%) !important; border-color: rgba(0, 245, 255, 0.3); }
+        }
         h1, h2 { letter-spacing: -0.04em; line-height: 0.95; }
         .marquee-container { overflow: hidden; white-space: nowrap; }
         .marquee-content { display: inline-block; animation: marquee 20s linear infinite; }
@@ -58,57 +84,80 @@
         .cta-section { padding: clamp(3rem, 8vw, 5rem) clamp(1.5rem, 5vw, 5rem); }
         .cta-title { font-size: clamp(2rem, 7vw, 4rem); }
 
+        /* ===== SELECTED WORKS ===== */
         .works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; grid-auto-rows: 400px; }
         @media (max-width: 1024px) { .works-grid { grid-auto-rows: 320px; } }
-        @media (max-width: 768px) { .works-grid { grid-template-columns: 1fr; grid-auto-rows: auto; } .works-grid .col-span-2 { grid-column: span 1; } .works-grid .row-span-2 { grid-row: span 1; } .works-grid > div { min-height: 280px; } }
 
+        /* Mobile: stacked cards. Each card sticks a little lower than the one before,
+           and JS scales/dims the cards underneath as the next one slides over them. */
+        @media (max-width: 768px) {
+            .works-grid { display: flex; flex-direction: column; gap: 1.25rem; }
+            .works-grid > a {
+                position: sticky;
+                top: calc(6rem + var(--i, 0) * 14px);
+                height: clamp(320px, 62vh, 440px);
+                overflow: hidden;
+                background-color: #0b0b14;
+                -webkit-backdrop-filter: none;
+                backdrop-filter: none;
+                box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.5);
+                transform-origin: 50% 0;
+                transition: border-color 0.4s ease;
+                will-change: transform;
+            }
+            .works-grid > a::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #05050a; opacity: var(--dim, 0); pointer-events: none; z-index: 30; }
+            .works-grid > a:last-child { margin-bottom: 10vh; }
+            .works-grid .graphic-img { width: 100%; height: 48% !important; object-fit: contain; }
+        }
+        @media (max-width: 600px) { .graphic-img { height: 160px !important; } }
+
+        /* ===== REVIEWS CAROUSEL ===== */
         .carousel-wrapper { position: relative; overflow: hidden; }
-        .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); touch-action: pan-y; }
         .carousel-slide { flex: 0 0 100%; padding: 0 8px; box-sizing: border-box; }
         @media (min-width: 640px) { .carousel-slide { flex: 0 0 50%; } }
         @media (min-width: 1024px) { .carousel-slide { flex: 0 0 33.333%; } }
+        /* Mobile: centered slide with the neighbours peeking in, swipe follows your finger */
+        @media (max-width: 639px) {
+            .carousel-slide { flex-basis: 86%; padding: 0 6px; opacity: 0.45; transform: scale(0.94); transition: opacity 0.4s ease, transform 0.4s ease; }
+            .carousel-slide.is-active { opacity: 1; transform: none; }
+            .carousel-btn { display: none; }
+        }
         .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; }
         #prevBtn { left: -8px; } #nextBtn { right: -8px; }
-        @media (max-width: 640px) { #prevBtn { left: 0; } #nextBtn { right: 0; } }
-        @media (max-width: 950px) {
-            #hero-logo { display: none; }
-            #hero-logo-mobile { display: block !important; }
-        }
+        .carousel-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: #4b5563; border: 0; padding: 0; cursor: pointer; transition: width 0.3s ease, background-color 0.3s ease; }
+        .carousel-dot.on { width: 24px; background: var(--accent-cyan); }
+        .carousel-dot::after { content: ''; position: absolute; inset: -10px -4px; }
 
-        /* on mobile (<=980px): hero scroll container is normal height, no sticky parallax */
-        @media (max-width: 980px) {
-            .hero-scroll-container { height: 100vh; }
-        }
-
-        .scrolly-container { position: relative; display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; } 
+        /* ===== SCROLLYTELLING ===== */
+        .scrolly-container { position: relative; display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
         @media (max-width: 768px) { .scrolly-container { grid-template-columns: 1fr; } }
-        #scrollyCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .text-col { padding: clamp(1.5rem, 5vw, 4rem); display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2;  }
+        /* Canvas is now viewport-sized and sticky, instead of one giant canvas the height of the section */
+        .scrolly-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+        #scrollyCanvas { position: sticky; top: 0; display: block; width: 100%; height: 100vh; }
+        .text-col { padding: clamp(1.5rem, 5vw, 4rem); display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
         @media (max-width: 768px) { .text-col { order: 2; padding: 1.5rem; } }
         .image-col { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; justify-content: center; z-index: 2; padding: 2rem; }
-        @media (max-width: 768px) { .image-col { position: relative; height: 55vw; min-height: 240px; max-height: 380px; order: 1; padding: 1rem; } }
+        @media (max-width: 768px) { .image-col { display: none; } }
 
-        .story-step { min-height: 90vh; opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; border-left: 2px solid transparent; padding-left: 2rem; margin-left: -2rem;  display: flex; flex-direction: column; justify-content: center; }
-        @media (max-width: 768px) { .story-step { min-height: 60vh; } }
-        .story-step.active { opacity: 1; transform: translateY(0); border-left-color: var(--accent-cyan);  }
+        .story-step { min-height: 90vh; opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; border-left: 2px solid transparent; padding-left: 2rem; margin-left: -2rem; display: flex; flex-direction: column; justify-content: center; }
+        .story-step.active { opacity: 1; transform: translateY(0); border-left-color: var(--accent-cyan); }
+        /* Mobile: accent line was pushed off-screen by the negative margin; inactive text no longer fully invisible */
+        @media (max-width: 768px) {
+            .story-step { min-height: 60vh; margin-left: 0; padding-left: 1rem; opacity: 0.3; }
+            .story-step.active { opacity: 1; }
+        }
 
         .step-tag { display: inline-block; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--accent-magenta); margin-bottom: 1rem; font-weight: 600; }
         .step-title { font-size: clamp(1.6rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--fg) 0%, var(--accent-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .step-text { font-size: clamp(0.9rem, 2vw, 1.1rem); line-height: 1.8; color: var(--muted); max-width: 450px; margin-bottom: 1.5rem; }
 
-        .hud-label { position: absolute; font-family: monospace; font-size: clamp(0.45rem, 1vw, 0.6rem); letter-spacing: 2px; text-transform: uppercase; pointer-events: none; z-index: 3; line-height: 1.8; }
-        .hud-tl { top: 1rem; left: 1rem; color: rgba(0,245,255,0.45); }
-        .hud-bc { bottom: 1rem; left: 50%; transform: translateX(-50%); color: rgba(255,238,0,0.45); white-space: nowrap; }
-        @media (max-width: 480px) { .hud-tl { display: none; } .hud-bc { font-size: 0.42rem; } }
-
         .scrolly-scanline { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,245,255,0.012) 2px, rgba(0,245,255,0.012) 4px); }
 
         .scene-image-frame { width: 100%; max-width: 400px; aspect-ratio: 3/4; position: relative; overflow: hidden; border-radius: 1.5rem; border: 1px solid rgba(0,245,255,0.2); box-shadow: 0 0 50px rgba(0,245,255,0.07), 0 0 120px rgba(0,245,255,0.03); transition: border-color 0.8s ease, box-shadow 0.8s ease; }
-        @media (max-width: 768px) { .scene-image-frame { max-width: 100%; aspect-ratio: 16/9; border-radius: 1rem; } }
         .scene-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.06); transition: opacity 0.85s ease, transform 0.85s ease; }
         .scene-img.active { opacity: 1; transform: scale(1); }
         .img-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(5,5,10,0.7) 0%, rgba(5,5,10,0.08) 50%, rgba(5,5,10,0.25) 100%); }
-        .scene-caption { position: absolute; bottom: 1rem; left: 1rem; right: 1rem; z-index: 2; font-family: monospace; font-size: clamp(0.42rem, 0.9vw, 0.55rem); letter-spacing: 2px; text-transform: uppercase; color: rgba(0,245,255,0.7); transition: color 0.8s ease; }
         .fc { position: absolute; width: 20px; height: 20px; z-index: 3; pointer-events: none; }
         .fc::before, .fc::after { content:''; position:absolute; background:rgba(0,245,255,0.55); }
         .fc-tl { top:.7rem; left:.7rem; } .fc-tl::before{top:0;left:0;width:100%;height:1px;} .fc-tl::after{top:0;left:0;width:1px;height:100%;}
@@ -117,52 +166,46 @@
         .fc-br { bottom:.7rem; right:.7rem; } .fc-br::before{bottom:0;right:0;width:100%;height:1px;} .fc-br::after{bottom:0;right:0;width:1px;height:100%;}
 
         .video-edits {
-            background-image: 
+            background-image:
                 linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%),
-                url("assets/video-edits.webp");
+                url("assets/vid.webp");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .marketing-container {
+            background-image:
+                linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.1) 100%),
+                url("assets/digi-mar.webp");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .web-container {
+            background-image:
+                linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.1) 100%),
+                url("assets/web-dev.webp");
             background-position: center center;
             background-repeat: no-repeat;
             background-size: cover;
         }
 
-        @media (max-width: 600px) { 
-            .graphic-img{ height: 160px !important; }
-        }
-
-        .marketing-container{
-            background-image: 
-                linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.1) 100%),
-                url("assets/marketing-bg.webp");
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-size: cover;  
-        }
-
-        .web-container{
-            background-image: 
-                linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.1) 100%),
-                url("assets/web-development.webp");
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-size: cover;  
-        }
-
-        /* BOOKING MODAL STYLES */
+        /* ===== BOOKING MODAL ===== */
         .bm-overlay {
             position: fixed; inset: 0; z-index: 100000;
             display: flex; align-items: center; justify-content: center; padding: 1rem;
             background: rgba(5,5,10,0.82);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
             opacity: 0; pointer-events: none;
             transition: opacity 0.28s ease;
         }
         .bm-overlay.is-open { opacity: 1; pointer-events: all; }
         .bm-modal {
-            position: relative; width: 100%; max-width: 600px; max-height: 92vh; overflow-y: auto;
+            position: relative; width: 100%; max-width: 600px; max-height: 92vh; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain;
             background: rgba(10,10,20,0.88);
             border: 1px solid rgba(0,245,255,0.18); border-radius: 28px;
             padding: 2.4rem 2.4rem 2rem;
-            backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px);
             box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 32px 80px rgba(0,0,0,0.65), 0 0 70px rgba(0,245,255,0.07);
             transform: translateY(22px) scale(0.97);
             transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
@@ -202,6 +245,8 @@
         .bm-label { font-size:0.7rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:#6b6b7a; }
         .bm-label .req { color:#ff00aa; margin-left:2px; }
         .bm-input,.bm-textarea,.bm-select { background:rgba(232,232,240,0.04); border:1px solid rgba(232,232,240,0.1); border-radius:12px; padding:0.75rem 1rem; color:#e8e8f0; font-size:0.9rem; font-family:'Inter',sans-serif; width:100%; box-sizing:border-box; transition:border-color 0.2s,box-shadow 0.2s,background 0.2s; outline:none; -webkit-appearance:none; }
+        /* iOS zooms into any field under 16px: keep touch devices at 16px */
+        @media (pointer: coarse) { .bm-input,.bm-textarea,.bm-select { font-size: 16px; } }
         .bm-input::placeholder,.bm-textarea::placeholder { color:#2e2e40; }
         .bm-input:focus,.bm-textarea:focus,.bm-select:focus { border-color:rgba(0,245,255,0.45); box-shadow:0 0 0 3px rgba(0,245,255,0.08); background:rgba(0,245,255,0.03); }
         .bm-input.err,.bm-textarea.err { border-color:rgba(255,0,170,0.5); box-shadow:0 0 0 3px rgba(255,0,170,0.08); }
@@ -228,12 +273,11 @@
         .bm-slots { display:grid; grid-template-columns:repeat(4,1fr); gap:0.4rem; }
         @media(max-width:400px){ .bm-slots{grid-template-columns:repeat(3,1fr);} }
         .bm-slot { padding:0.55rem 0.3rem; border-radius:10px; border:1px solid rgba(232,232,240,0.09); background:rgba(232,232,240,0.03); font-size:0.7rem; font-weight:600; color:#6b6b7a; text-align:center; cursor:pointer; transition:all 0.18s; font-family:monospace; }
-        .bm-slot:hover:not(.na):not(.taken) { border-color:rgba(0,245,255,0.3); color:#00f5ff; background:rgba(0,245,255,0.05); }
+        .bm-slot:hover:not(.na):not(.taken):not(.past) { border-color:rgba(0,245,255,0.3); color:#00f5ff; background:rgba(0,245,255,0.05); }
         .bm-slot.sel { background:linear-gradient(135deg,rgba(0,245,255,0.15),rgba(255,0,170,0.15)); border-color:rgba(0,245,255,0.5); color:#00f5ff; box-shadow:0 0 14px rgba(0,245,255,0.1); }
-        .bm-slot.na { opacity:0.22; cursor:not-allowed; text-decoration:line-through; pointer-events:none; }
+        .bm-slot.na, .bm-slot.past { opacity:0.22; cursor:not-allowed; text-decoration:line-through; pointer-events:none; }
         .bm-slot.taken { opacity:0.22; cursor:not-allowed; text-decoration:line-through; pointer-events:none; color:#ff00aa; border-color:rgba(255,0,170,0.2); position:relative; }
         .bm-slot.taken::after { content:'✕'; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:0.6rem; color:#ff00aa; }
-        .bm-slots-loading { text-align:center; font-size:0.72rem; color:#6b6b7a; font-family:monospace; padding:0.75rem; letter-spacing:1px; }
         .bm-divider { height:1px; background:rgba(232,232,240,0.07); border:none; margin:0.15rem 0; }
         .bm-ics-banner { display:flex; align-items:flex-start; gap:0.75rem; padding:0.85rem 1rem; background:rgba(255,238,0,0.04); border:1px solid rgba(255,238,0,0.16); border-radius:12px; }
         .bm-ics-icon { font-size:1.15rem; flex-shrink:0; margin-top:1px; }
@@ -252,63 +296,75 @@
         @keyframes bmpop { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
         .bm-s-title { font-size:1.5rem; font-weight:800; letter-spacing:-0.04em; background:linear-gradient(135deg,#e8e8f0,#00f5ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .bm-s-msg { font-size:0.84rem; color:#6b6b7a; line-height:1.7; max-width:340px; }
-        .bm-s-detail { padding:0.9rem 1.25rem; width:100%; max-width:360px; text-align:left; background:rgba(0,245,255,0.05); border:1px solid rgba(0,245,255,0.15); border-radius:14px; font-size:0.73rem; color:#00f5ff; font-family:monospace; letter-spacing:0.8px; line-height:2.1; }
+        .bm-s-detail { padding:0.9rem 1.25rem; width:100%; max-width:360px; text-align:left; background:rgba(0,245,255,0.05); border:1px solid rgba(0,245,255,0.15); border-radius:14px; font-size:0.73rem; color:#00f5ff; font-family:monospace; letter-spacing:0.8px; line-height:2.1; word-break:break-word; }
         .bm-s-dl { display:inline-flex; align-items:center; gap:8px; padding:0.7rem 1.4rem; background:rgba(255,238,0,0.1); border:1px solid rgba(255,238,0,0.35); border-radius:100px; color:#ffee00; font-size:0.8rem; font-weight:700; cursor:pointer; text-decoration:none; font-family:'Inter',sans-serif; transition:all 0.2s; }
         .bm-s-dl:hover { background:rgba(255,238,0,0.18); transform:translateY(-1px); box-shadow:0 6px 20px rgba(255,238,0,0.15); }
         .bm-s-reminders { display:flex; flex-direction:column; gap:0.4rem; padding:0.85rem 1rem; width:100%; max-width:360px; background:rgba(255,238,0,0.04); border:1px solid rgba(255,238,0,0.12); border-radius:12px; font-size:0.71rem; color:#6b6b60; line-height:1.5; }
         .bm-s-reminders span { display:flex; align-items:center; gap:7px; }
         .bm-db-error { display:none; align-items:center; gap:0.6rem; padding:0.75rem 1rem; background:rgba(255,0,170,0.07); border:1px solid rgba(255,0,170,0.3); border-radius:12px; font-size:0.75rem; color:#ff00aa; }
         .bm-db-error.show { display:flex; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .marquee-content, .globe-hint i, .bm-modal::before { animation: none; }
+            .pop-up-section { opacity: 1; transform: none; transition: none; }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-[#00f5ff] selection:text-black">
+
+    <!-- Star icon, defined once and reused by every review -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="star" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></symbol>
+    </svg>
 
     <div class="cursor" id="cursor"></div>
     <div class="cursor-dot" id="cursorDot"></div>
     <canvas id="sparkCanvas"></canvas>
     <div class="progress-bar" id="progressBar"></div>
     <div class="glow-gradient"></div>
- 
+
     <!-- NAV -->
-    <nav class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl" id="navigation">
-        <div class="glass-card px-[-50] py-2.5 rounded-full nav-pill text-sm font-medium text-[#6b6b7a]">
+    <nav class="fixed top-10 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-xl" id="navigation" aria-label="Main">
+        <div class="glass-card px-5 py-2.5 rounded-full nav-pill text-sm font-medium text-[#6b6b7a]">
             <a href="#work" class="flex items-center hover:text-[#e8e8f0] transition-colors">Work</a>
             <a href="#reviews" class="flex items-center hover:text-[#e8e8f0] transition-colors">Reviews</a>
             <a href="#about" class="flex items-center hover:text-[#e8e8f0] transition-colors">About</a>
             <button onclick="bmOpen()" class="text-[#05050a] bg-[#00f5ff] px-3 py-1 rounded-full hover:bg-[#ff00aa] hover:text-[#e8e8f0] transition-all font-bold whitespace-nowrap cursor-pointer border-0">Hire Me</button>
         </div>
-    </nav>  
+    </nav>
 
     <!-- HERO -->
     <div class="hero-scroll-container">
         <div class="hero-sticky-wrapper">
             <canvas id="globe-canvas"></canvas>
-            <img src="assets/m-logo.png" alt="" id="hero-logo" style="width: 90px; height: auto; position: fixed; left: 4rem; top: 6.5%; transform: translateY(-50%); z-index: 49;">
-            <img src="assets/m-logo.png" alt="" id="hero-logo-mobile" style="display: none; width: 90px; height: auto; position: relative; bottom: 1rem; left: 10%; transform: translateX(-50%); z-index: 999999999999999999999999999;">
+            <img src="assets/m-logo.png" alt="LUNAX Marketing" id="hero-logo" style="width: 90px; height: auto; position: fixed; left: 4rem; top: 6.5%; transform: translateY(-50%); z-index: 49;">
+            <img src="assets/m-logo.png" alt="LUNAX Marketing" id="hero-logo-mobile">
 
             <div class="hero-content px-4">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#00f5ff]/30 bg-[#00f5ff]/5 text-xs text-[#00f5ff] mb-8 uppercase tracking-widest font-semibold" >
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#00f5ff]/30 bg-[#00f5ff]/5 text-xs text-[#00f5ff] mb-8 uppercase tracking-widest font-semibold">
                     <span class="w-2 h-2 rounded-full bg-[#ff00aa] animate-pulse"></span>
-                     AI-Driven Strategies. Limitless Growth
+                    AI-Driven Strategies. Limitless Growth
                 </div>
                 <h1 id="animated-heading" class="text-5xl md:text-8xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-b from-[#e8e8f0] to-[#6b6b7a] min-h-[2.5em] md:min-h-[2em]">
                     <span id="line1"></span><br><span id="line2"></span>
                 </h1>
+                <div class="globe-hint" id="globeHint" aria-hidden="true"><i>←</i>Swipe to spin the globe<i>→</i></div>
             </div>
         </div>
     </div>
 
-    <!-- MARQUEE -->
+    <!-- MARQUEE (both halves must be identical for a seamless loop) -->
     <div class="pop-up-section border-y border-[#e8e8f0]/10 py-3 mb-12 md:mb-20 relative z-10 bg-[#05050a]/50 backdrop-blur-sm overflow-hidden">
         <div class="marquee-container">
             <div class="marquee-content font-bold text-transparent opacity-70">
                 <span class="mx-4 md:mx-8" style="-webkit-text-stroke: 1px rgba(232,232,240,0.99);">Conversion Intelligence</span>
                 <span class="mx-4 md:mx-8 text-[#00f5ff]" style="-webkit-text-stroke: 1px rgba(0,245,255,0.99);">HEADLESS E-COMMERCE</span>
                 <span class="mx-4 md:mx-8" style="-webkit-text-stroke: 1px rgba(232,232,240,0.99);">BRAND IDENTITY</span>
-                <span class="mx-4 md:mx-8 text-[#ff00aa]" style="-webkit-text-stroke: 1px rgba(255,0,170,0.99);">LIQUID</span>
+                <span class="mx-4 md:mx-8 text-[#ff00aa]" style="-webkit-text-stroke: 1px rgba(255,0,170,0.99);">LIQUID MASTERY</span>
                 <span class="mx-4 md:mx-8" style="-webkit-text-stroke: 1px rgba(232,232,240,0.99);">AGENTIC COMMERCE</span>
                 <span class="mx-4 md:mx-8" style="-webkit-text-stroke: 1px rgba(232,232,240,0.99);">Conversion Intelligence</span>
-                <span class="mx-4 md:mx-8 text-[#00f5ff]" style="-webkit-text-stroke: 1px rgba(0,245,255,0.99);">HEADLESS  E-COMMERCE</span>
+                <span class="mx-4 md:mx-8 text-[#00f5ff]" style="-webkit-text-stroke: 1px rgba(0,245,255,0.99);">HEADLESS E-COMMERCE</span>
                 <span class="mx-4 md:mx-8" style="-webkit-text-stroke: 1px rgba(232,232,240,0.99);">BRAND IDENTITY</span>
                 <span class="mx-4 md:mx-8 text-[#ff00aa]" style="-webkit-text-stroke: 1px rgba(255,0,170,0.99);">LIQUID MASTERY</span>
                 <span class="mx-4 md:mx-8" style="-webkit-text-stroke: 1px rgba(232,232,240,0.99);">AGENTIC COMMERCE</span>
@@ -323,46 +379,45 @@
             <p class="text-[#6b6b7a] max-w-sm md:text-right text-sm md:text-base">Highlights from the past year. Optimized for conversion and brand storytelling.</p>
         </div>
         <div class="works-grid">
-           <a href="ecommerce-1.html"
-   class="glass-card rounded-3xl md:col-span-2 md:row-span-2 p-6 md:p-8 flex flex-col justify-between group relative overflow-hidden h-[268px] md:h-auto block">
-    <div class="absolute inset-0 bg-gradient-to-t from-[#05050a] via-transparent to-transparent opacity-10 z-10"></div>
-    <img src="assets/ecom.webp" alt="Abstract 3D" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-50">
-    <div class="relative z-20">
-        <h3 class="text-2xl md:text-4xl font-bold mb-2">E-Commerce Growth & Management.</h3>
-        <p class="text-[#e8e8f0]/80 text-sm md:text-base">We turn your online store into a high converting sales engine powered by strategy, data, and smart optimization.</p>
-    </div>
-</a>
-<a href="video-1.html" class="glass-card rounded-3xl p-6 relative video-edits block h-[268px] md:h-auto">
-    <div class="absolute bottom-6 right-6 text-right">
-        <h3 class="text-xl md:text-2xl font-bold mb-2">Video Editing</h3>
-        <p class="text-[#e8e8f0]/80 mt-2 text-xs md:text-sm">Strategic edits that boost engagement and brand visibility.</p>
-    </div>
-</a>
+            <a href="ecommerce-1.html" class="glass-card rounded-3xl md:col-span-2 md:row-span-2 p-6 md:p-8 flex flex-col justify-between group relative overflow-hidden h-[268px] md:h-auto block">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#05050a] via-transparent to-transparent opacity-10 z-10"></div>
+                <img src="assets/e-com.webp" alt="" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-50">
+                <div class="relative z-20">
+                    <h3 class="text-2xl md:text-4xl font-bold mb-2">E-Commerce Growth &amp; Management.</h3>
+                    <p class="text-[#e8e8f0]/80 text-sm md:text-base">We turn your online store into a high converting sales engine powered by strategy, data, and smart optimization.</p>
+                </div>
+            </a>
+            <a href="video-1.html" class="glass-card rounded-3xl p-6 relative video-edits block h-[268px] md:h-auto">
+                <div class="absolute bottom-6 right-6 text-right">
+                    <h3 class="text-xl md:text-2xl font-bold mb-2">Video Editing</h3>
+                    <p class="text-[#e8e8f0]/80 mt-2 text-xs md:text-sm">Strategic edits that boost engagement and brand visibility.</p>
+                </div>
+            </a>
             <a href="graphic-design.html" class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between h-[268px] md:h-auto">
                 <div>
                     <h3 class="text-xl md:text-2xl font-bold mb-2">Graphic Designing</h3>
                     <p class="text-[#e8e8f0]/80 text-xs md:text-sm">Every visual created to communicate, engage, and convert.</p>
                 </div>
-                <img src="assets/graphic.webp" alt="" class="graphic-img" style="height: 250px;">
+                <img src="assets/graphic1.webp" alt="" loading="lazy" decoding="async" class="graphic-img" style="height: 250px;">
             </a>
-            <a href="marketing.html" class="glass-card rounded-3xl md:col-span-2 p-6 md:p-8 flex items-center justify-between gap-4 h-[268px] md:h-auto marketing-container" >
+            <a href="marketing.html" class="glass-card rounded-3xl md:col-span-2 p-6 md:p-8 flex items-center justify-between gap-4 h-[268px] md:h-auto marketing-container">
                 <div>
                     <h3 class="text-xl md:text-3xl font-bold mb-2">Digital Marketing</h3>
                     <p class="text-[#e8e8f0]/80 max-w-md text-sm md:text-base">Smart, data-backed strategies built to increase traffic, generate quality leads, and maximise revenue.</p>
                 </div>
             </a>
-           <a href="webdev.html" class="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden group h-[268px] md:h-auto web-container">
-    <div class="absolute bottom-6 right-6 text-right">
-        <h3 class="text-xl md:text-2xl font-bold">Website Development</h3>
-        <p class="text-[#e8e8f0]/80 mt-2 text-xs md:text-sm p-3">High performance websites designed to attract, engage, and turn visitors into customers.</p>
-    </div>
-</a>
+            <a href="webdev.html" class="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden group h-[268px] md:h-auto web-container">
+                <div class="absolute bottom-6 right-6 text-right">
+                    <h3 class="text-xl md:text-2xl font-bold">Website Development</h3>
+                    <p class="text-[#e8e8f0]/80 mt-2 text-xs md:text-sm p-3">High performance websites designed to attract, engage, and turn visitors into customers.</p>
+                </div>
+            </a>
         </div>
     </main>
 
-    <!-- SCROLLYTELLING -->
-    <div class="pop-up-section scrolly-container" id="scrolly-section" >
-        <canvas id="scrollyCanvas"></canvas>
+    <!-- SCROLLYTELLING / ABOUT -->
+    <div class="pop-up-section scrolly-container" id="about">
+        <div class="scrolly-bg"><canvas id="scrollyCanvas"></canvas></div>
         <div class="scrolly-scanline"></div>
         <div class="text-col">
             <div id="step-intro" class="story-step" data-scene="intro">
@@ -382,41 +437,149 @@
                 <p class="step-text">We are committed to transparency, measurable results, and long-term partnerships. We take ownership of performance and treat every brand's growth as our responsibility.</p>
             </div>
         </div>
-        <div class="image-col" >
+        <div class="image-col">
             <div class="scene-image-frame" id="sceneFrame">
                 <div class="fc fc-tl"></div><div class="fc fc-tr"></div><div class="fc fc-bl"></div><div class="fc fc-br"></div>
-                <img class="scene-img active" data-scene-img="intro" src="assets/mission.webp" alt="Deep space">
-                <img class="scene-img" data-scene-img="discovery" src="assets/vision.webp" alt="Signal detected">
-                <img class="scene-img" data-scene-img="conflict" src="assets/value.webp" alt="Decryption">
-                <img class="scene-img" data-scene-img="transcend" src="assets/commitment.webp" alt="Connection">
+                <img class="scene-img active" data-scene-img="intro" src="assets/mission1.webp" alt="" loading="lazy" decoding="async">
+                <img class="scene-img" data-scene-img="discovery" src="assets/vision1.webp" alt="" loading="lazy" decoding="async">
+                <img class="scene-img" data-scene-img="conflict" src="assets/value1.webp" alt="" loading="lazy" decoding="async">
+                <img class="scene-img" data-scene-img="transcend" src="assets/comit2.webp" alt="" loading="lazy" decoding="async">
                 <div class="img-overlay"></div>
             </div>
-        </div> 
+        </div>
     </div>
 
     <!-- REVIEWS -->
-    <section class="pop-up-section relative z-10 max-w-7xl mx-auto px-4 pb-16 md:pb-32 pt-12 " id="reviews">
+    <section class="pop-up-section relative z-10 max-w-7xl mx-auto px-4 pb-16 md:pb-32 pt-12" id="reviews">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-12 border-b border-[#e8e8f0]/10 pb-6 md:pb-8 gap-4">
             <h2 class="text-3xl md:text-5xl font-bold display-font bg-clip-text text-transparent bg-gradient-to-b from-[#e8e8f0] to-[#6b6b7a]">Client<br>Stories</h2>
             <p class="text-[#6b6b7a] max-w-sm md:text-right text-sm md:text-base">Trusted by innovative brands worldwide.</p>
         </div>
         <div class="carousel-wrapper px-2">
             <div class="carousel-track" id="reviewCarousel">
-                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Working with this team completely transformed our Amazon store. Our listings started ranking within weeks, and conversions improved significantly. They really understand how to scale an e-commerce business the right way.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#00f5ff] to-[#ff00aa] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="Sarah"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Sarah L.</p></div></div></div></div>
-                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">We hired them for Shopify optimization and Meta ads, and the results were outstanding. Our ROAS improved, traffic increased, and sales are now more consistent than ever. Highly professional and data-driven approach.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#ffee00] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="Rayyan"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Rayyan</p></div></div></div></div>
-                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Great experience overall. The Google Ads campaigns brought in quality traffic, and our brand visibility improved a lot. Communication was good, just needed slightly faster updates at times.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#00f5ff] to-[#ffee00] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="Jenna"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Jenna</p></div></div></div></div>
-                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">They did an excellent job on our website development and graphics. The site looks modern and performs well. A few revisions were needed, but they handled everything professionally.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="Alina"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Alina</p></div></div></div></div>
-                  <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">An average experience overall. The final results were okay, but I was hoping for more impactful growth, especially in the early stages.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#00f5ff] to-[#ff00aa] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="Abraham"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Abraham</p></div></div></div></div>
-                     <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">From product listing optimization on eBay to full store management, everything was handled flawlessly. Their strategies helped us expand into new markets, including Etsy and bol.com. Truly impressive results.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#ffee00] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="hana"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Hana</p></div></div></div></div>
-                     <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Social media management and content design were very well executed. Engagement increased steadily, and the brand looks much more polished now. Results took a bit of time but were worth it.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="Noah"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Noah</p></div></div></div></div>
-                     <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Solid performance improvements on our Amazon and Shopify stores. Their PPC strategies worked well, and we saw a gradual increase in sales. Minor delays, but overall a reliable team.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="sabir"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Sabir</p></div></div></div></div>
-                     <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px]"><div><div class="flex gap-1 mb-4"><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg></div><p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">There were good ideas and strategies, especially for social media and ads. However, the process could have been more streamlined, and timelines were occasionally unclear.</p></div><div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt="lina"></div><div><p class="font-bold text-[#e8e8f0] text-sm md:text-base">Lina</p></div></div></div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 5 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Working with this team completely transformed our Amazon store. Our listings started ranking within weeks, and conversions improved significantly. They really understand how to scale an e-commerce business the right way.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#00f5ff] to-[#ff00aa] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Sarah L.</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 5 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">We hired them for Shopify optimization and Meta ads, and the results were outstanding. Our ROAS improved, traffic increased, and sales are now more consistent than ever. Highly professional and data-driven approach.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#ffee00] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Rayyan</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 4 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Great experience overall. The Google Ads campaigns brought in quality traffic, and our brand visibility improved a lot. Communication was good, just needed slightly faster updates at times.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#00f5ff] to-[#ffee00] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Jenna</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 4 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">They did an excellent job on our website development and graphics. The site looks modern and performs well. A few revisions were needed, but they handled everything professionally.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Alina</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 3 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">An average experience overall. The final results were okay, but I was hoping for more impactful growth, especially in the early stages.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#00f5ff] to-[#ff00aa] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Abraham</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 5 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">From product listing optimization on eBay to full store management, everything was handled flawlessly. Their strategies helped us expand into new markets, including Etsy and bol.com. Truly impressive results.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#ffee00] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Hana</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 4 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Social media management and content design were very well executed. Engagement increased steadily, and the brand looks much more polished now. Results took a bit of time but were worth it.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Noah</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 4 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">Solid performance improvements on our Amazon and Shopify stores. Their PPC strategies worked well, and we saw a gradual increase in sales. Minor delays, but overall a reliable team.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/male-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Sabir</p>
+                    </div>
+                </div></div>
+
+                <div class="carousel-slide"><div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between min-h-[280px] md:min-h-[300px] h-full">
+                    <div>
+                        <div class="flex gap-1 mb-4" role="img" aria-label="Rated 3 out of 5">
+                            <svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg><svg class="w-4 h-4 md:w-5 md:h-5 text-[#ffee00]" fill="currentColor" aria-hidden="true"><use href="#star"/></svg>
+                        </div>
+                        <p class="text-base md:text-lg text-[#e8e8f0] leading-relaxed">There were good ideas and strategies, especially for social media and ads. However, the process could have been more streamlined, and timelines were occasionally unclear.</p>
+                    </div>
+                    <div class="flex items-center gap-3 md:gap-4 mt-6 pt-5 border-t border-[#e8e8f0]/10">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-tr from-[#ff00aa] to-[#00f5ff] p-[2px] shrink-0"><img src="assets/female-avatar.jpg" loading="lazy" decoding="async" class="rounded-full w-full h-full object-cover border-2 border-[#05050a]" alt=""></div>
+                        <p class="font-bold text-[#e8e8f0] text-sm md:text-base">Lina</p>
+                    </div>
+                </div></div>
 
             </div>
-            <button id="prevBtn" class="carousel-btn glass-card p-2 md:p-3 rounded-full hover:bg-[#00f5ff]/20 transition-colors"><svg class="w-5 h-5 md:w-6 md:h-6 text-[#e8e8f0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-            <button id="nextBtn" class="carousel-btn glass-card p-2 md:p-3 rounded-full hover:bg-[#00f5ff]/20 transition-colors"><svg class="w-5 h-5 md:w-6 md:h-6 text-[#e8e8f0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            <button id="prevBtn" type="button" aria-label="Previous review" class="carousel-btn glass-card p-2 md:p-3 rounded-full hover:bg-[#00f5ff]/20 transition-colors"><svg class="w-5 h-5 md:w-6 md:h-6 text-[#e8e8f0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+            <button id="nextBtn" type="button" aria-label="Next review" class="carousel-btn glass-card p-2 md:p-3 rounded-full hover:bg-[#00f5ff]/20 transition-colors"><svg class="w-5 h-5 md:w-6 md:h-6 text-[#e8e8f0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
         </div>
-        <div class="flex justify-center gap-2 mt-6 md:mt-8" id="carouselDots"></div>
+        <div class="flex justify-center items-center gap-2 mt-6 md:mt-8" id="carouselDots"></div>
     </section>
 
     <!-- CTA -->
@@ -439,7 +602,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center gap-2 text-xl font-bold text-[#e8e8f0]">
-                            <img src="assets/m-logo.png" alt="" style="width: 70px;" height="auto">
+                            <img src="assets/m-logo.png" alt="LUNAX Marketing" loading="lazy" decoding="async" style="width: 70px; height: auto;">
                         </div>
                         <p class="text-sm text-[#6b6b7a]">Building AI-powered solutions that drive limitless growth, helping brands succeed in the ever evolving digital world.</p>
                     </div>
@@ -457,22 +620,17 @@
                     <div>
                         <h4 class="font-semibold text-[#e8e8f0] mb-4">Social Media</h4>
                         <ul class="space-y-2 text-sm text-[#6b6b7a]">
-                             <li><a href="https://www.linkedin.com/company/lunax-marketing/" class="hover:text-[#00f5ff] transition-colors">Linkdin</a></li>
-                            <li><a href="https://www.instagram.com/lunaxmarketing.official/" class="hover:text-[#00f5ff] transition-colors">Instagram</a></li>
-                            <li><a href="https://www.facebook.com/profile.php?id=61574238251129" class="hover:text-[#00f5ff] transition-colors">Facebook</a></li>
-                            <li><a href="https://www.tiktok.com/@lunaxmarketing.official?lang=en-GB" class="hover:text-[#00f5ff] transition-colors">TikTok</a></li>
+                            <li><a href="https://www.linkedin.com/company/lunax-marketing/" target="_blank" rel="noopener noreferrer" class="hover:text-[#00f5ff] transition-colors">LinkedIn</a></li>
+                            <li><a href="https://www.instagram.com/lunaxmarketing.official/" target="_blank" rel="noopener noreferrer" class="hover:text-[#00f5ff] transition-colors">Instagram</a></li>
+                            <li><a href="https://www.facebook.com/profile.php?id=61574238251129" target="_blank" rel="noopener noreferrer" class="hover:text-[#00f5ff] transition-colors">Facebook</a></li>
+                            <li><a href="https://www.tiktok.com/@lunaxmarketing.official?lang=en-GB" target="_blank" rel="noopener noreferrer" class="hover:text-[#00f5ff] transition-colors">TikTok</a></li>
                         </ul>
                     </div>
                     <div>
                         <h4 class="font-semibold text-[#e8e8f0] mb-4">Contact</h4>
                         <div class="space-y-2 text-sm text-[#6b6b7a]">
                             <p>Johar Town, Lahore<br>Pakistan</p>
-                           <p>
-  <a href="mailto:info@lunaxmarketing.com?subject=Inquiry&body=Hello, I want to ask about..."
-     class="hover:text-[#00f5ff] transition-colors">
-    info@lunaxmarketing.com
-  </a>
-</p>
+                            <p><a href="mailto:info@lunaxmarketing.com?subject=Inquiry&amp;body=Hello, I want to ask about..." class="hover:text-[#00f5ff] transition-colors">info@lunaxmarketing.com</a></p>
                             <p><a href="tel:+923003588762" class="hover:text-[#00f5ff] transition-colors">+92 300-3588762</a></p>
                         </div>
                     </div>
@@ -491,18 +649,18 @@
     <!-- BOOKING MODAL -->
     <div class="bm-overlay" id="bmOverlay" role="dialog" aria-modal="true" aria-labelledby="bmTitle">
       <div class="bm-modal">
-        <button class="bm-close" id="bmClose" aria-label="Close modal">✕</button>
+        <button class="bm-close" id="bmClose" type="button" aria-label="Close">✕</button>
         <div class="bm-success" id="bmSuccess">
           <div class="bm-s-icon">🚀</div>
           <div class="bm-s-title">You're booked!</div>
-          <p class="bm-s-msg">Confirmation emails are on their way. Download your calendar invite — the 24-hour and 30-minute alarms are already baked in.</p>
+          <p class="bm-s-msg" id="bmSuccessMsg">Confirmation emails are on their way. Download your calendar invite — the 24-hour and 30-minute alarms are already baked in.</p>
           <div class="bm-s-detail" id="bmDetail"></div>
           <a class="bm-s-dl" id="bmIcsDl" href="#">📅 &nbsp;Download Calendar Invite (.ics)</a>
           <div class="bm-s-reminders">
             <span>⏰ <strong style="color:#ffee00">24-hour alarm</strong> — built into the calendar file</span>
             <span>🔔 <strong style="color:#ffee00">30-minute alarm</strong> — built into the calendar file</span>
-            <span>✉️ Confirmation sent to your inbox</span>
-            <span>📬 Admin notified instantly</span>
+            <span id="bmEmailNote">✉️ Confirmation sent to your inbox</span>
+            <span id="bmAdminNote">📬 Admin notified instantly</span>
           </div>
         </div>
         <div id="bmFormWrap">
@@ -519,9 +677,9 @@
               <label class="bm-label">Select Date <span class="req">*</span></label>
               <div class="bm-calendar">
                 <div class="bm-cal-header">
-                  <button type="button" class="bm-cal-nav" id="calPrev">‹</button>
+                  <button type="button" class="bm-cal-nav" id="calPrev" aria-label="Previous month">‹</button>
                   <span class="bm-cal-month" id="calLabel"></span>
-                  <button type="button" class="bm-cal-nav" id="calNext">›</button>
+                  <button type="button" class="bm-cal-nav" id="calNext" aria-label="Next month">›</button>
                 </div>
                 <div class="bm-cal-grid" id="calGrid"></div>
                 <div class="bm-sel-date" id="calChosen">No date selected yet</div>
@@ -557,7 +715,7 @@
               </div>
               <div class="bm-field">
                 <label class="bm-label" for="bmEmail">Email <span class="req">*</span></label>
-                <input class="bm-input" id="bmEmail" type="email" placeholder="alex@company.com" autocomplete="email">
+                <input class="bm-input" id="bmEmail" type="email" inputmode="email" placeholder="alex@company.com" autocomplete="email">
                 <span class="bm-errmsg" id="eEmail">Please enter a valid email.</span>
               </div>
             </div>
@@ -573,11 +731,10 @@
                 <option value="Other">Something Else</option>
               </select>
             </div>
-    
             <div class="bm-field">
               <label class="bm-label" for="bmMsg">Message <span class="req">*</span></label>
               <textarea class="bm-textarea" id="bmMsg" placeholder="Tell me a bit about your project…" rows="3"></textarea>
-              <span class="bm-errmsg" id="eMsg">Please enter the Message.</span>
+              <span class="bm-errmsg" id="eMsg">Please enter a message.</span>
             </div>
             <div class="bm-db-error" id="bmDbError">
               ⚠️ <span id="bmDbErrorMsg">Could not save your booking. Please try again.</span>
@@ -599,7 +756,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
     <script>
-        const isMobileDevice = window.innerWidth <= 980 || /Mobi|Android/i.test(navigator.userAgent);
+    const isMobileDevice = window.innerWidth <= 980 || /Mobi|Android/i.test(navigator.userAgent);
+    const canHover = window.matchMedia('(hover: hover)').matches;
+
     // ================================================================
     //  CONFIG
     // ================================================================
@@ -610,249 +769,321 @@
         serviceId:    'YOUR_SERVICE_ID',
         tplUser:      'YOUR_USER_TEMPLATE_ID',
         tplAdmin:     'YOUR_ADMIN_TEMPLATE_ID',
-        adminEmail:   'hello@winter.com',
+        adminEmail:   'info@lunaxmarketing.com',
+        brand:        'LUNAX Marketing',
     };
+    const emailConfigured = !Object.values(CFG).some(v => String(v).startsWith('YOUR_'));
 
-    const _supabase = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
-    try { emailjs.init({ publicKey: CFG.publicKey }); } catch(e) {}
+    // If a CDN fails to load, the rest of the page (globe, carousel...) still works
+    const _supabase = window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey) : null;
+    if (emailConfigured && window.emailjs) { try { emailjs.init({ publicKey: CFG.publicKey }); } catch (e) {} }
 
     // ===== POP-UP SECTIONS =====
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('is-visible');
-            else entry.target.classList.remove('is-visible');
-        });
-    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
-    document.querySelectorAll('.pop-up-section').forEach(s => observer.observe(s));
+    // threshold 0 + bottom margin works for sections of any height (a ratio threshold can
+    // never be reached by sections taller than ~6 screens, which happens on phones)
+    const popObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => entry.target.classList.toggle('is-visible', entry.isIntersecting));
+    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+    document.querySelectorAll('.pop-up-section').forEach(s => popObserver.observe(s));
 
-    // ===== THREE.JS GLOBE =====
-    const canvas = document.getElementById('globe-canvas');
-    const heroContent = document.querySelector('.hero-content');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // ================================================================
+    //  HERO GLOBE (three.js)
+    // ================================================================
+    (function initGlobe() {
+        const canvas        = document.getElementById('globe-canvas');
+        const heroContainer = document.querySelector('.hero-scroll-container');
+        const heroWrap      = document.querySelector('.hero-sticky-wrapper');
+        const heroContent   = document.querySelector('.hero-content');
+        const logo          = document.getElementById('hero-logo');
+        const Mlogo         = document.getElementById('hero-logo-mobile');
+        const hint          = document.getElementById('globeHint');
 
-    const globeGroup = new THREE.Group();
-    scene.add(globeGroup);
-    const sphereGeo = new THREE.IcosahedronGeometry(1, 3);
-    const wireframeGeo = new THREE.WireframeGeometry(sphereGeo);
-    const mat = new THREE.LineBasicMaterial({ color: 0x00f5ff, linewidth: 1, transparent: true, opacity: 0.7 });
-    const wireframe = new THREE.LineSegments(wireframeGeo, mat);
-    globeGroup.add(wireframe);
-    const coreMat = new THREE.MeshBasicMaterial({ color: 0x00f5ff, transparent: true, opacity: 0.1 });
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.98, 3), coreMat);
-    globeGroup.add(core);
-    const particlesGeo = new THREE.BufferGeometry();
-    const particlesCount = isMobileDevice ? 150 : 300;
-    const posArray = new Float32Array(particlesCount * 3);
-    for (let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 5;
-    particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particlesMat = new THREE.PointsMaterial({ size: 0.005, color: 0xffee00, transparent: true, opacity: 0.6 });
-    const particles = new THREE.Points(particlesGeo, particlesMat);
-    scene.add(particles);
-    camera.position.z = 3.5;
+        function setHeroFade(opacity, ty) {
+            heroContent.style.opacity   = opacity;
+            heroContent.style.transform = `translateY(${ty}px)`;
+            if (logo)  logo.style.opacity  = opacity;
+            if (Mlogo) Mlogo.style.opacity = opacity;
+        }
 
-    // Check if mobile (<=980px)
-    const isMobile = () => window.innerWidth <= 980;
+        if (!window.THREE) { setHeroFade(1, 0); return; }
 
-    let targetScale    = 0.1;
-    let targetY        = -2.0;
-    let targetOpacity  = 0.0;
-    let targetRotSpeed = 0.003;
+        const scene    = new THREE.Scene();
+        const camera   = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        camera.position.z = 3.5;
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileDevice ? 1.5 : 2));
 
-    globeGroup.scale.set(0.1, 0.1, 0.1);
-    globeGroup.position.y = -2.0;
-    wireframe.material.opacity = 0;
-    core.material.opacity      = 0;
-    particles.material.opacity = 0;
+        const globeGroup = new THREE.Group();
+        scene.add(globeGroup);
+        const wireframe = new THREE.LineSegments(
+            new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(1, 3)),
+            new THREE.LineBasicMaterial({ color: 0x00f5ff, transparent: true, opacity: 0 })
+        );
+        globeGroup.add(wireframe);
+        const core = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(0.98, 3),
+            new THREE.MeshBasicMaterial({ color: 0x00f5ff, transparent: true, opacity: 0 })
+        );
+        globeGroup.add(core);
 
-    const heroContainer = document.querySelector('.hero-scroll-container');
-    const logo  = document.getElementById('hero-logo');
-    const Mlogo = document.getElementById('hero-logo-mobile');
+        const particlesCount = isMobileDevice ? 150 : 300;
+        const posArray = new Float32Array(particlesCount * 3);
+        for (let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 5;
+        const particlesGeo = new THREE.BufferGeometry();
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particles = new THREE.Points(particlesGeo, new THREE.PointsMaterial({ size: 0.005, color: 0xffee00, transparent: true, opacity: 0 }));
+        scene.add(particles);
 
-    // INTRO animation plays on page load on all devices
-    const INTRO_DURATION = 1800;
-    const introStart     = performance.now();
-    let introComplete    = false;
+        // Size the renderer to the sticky wrapper (not window.innerHeight). On phones the URL bar
+        // changes innerHeight while scrolling, which used to resize the canvas and make the globe jump.
+        let gW = 0, gH = 0;
+        function sizeGlobe() {
+            const w = heroWrap.clientWidth, h = heroWrap.clientHeight;
+            if (!w || !h || (w === gW && h === gH)) return false;
+            gW = w; gH = h;
+            renderer.setSize(w, h, false);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            return true;
+        }
+        sizeGlobe();
 
-    function runIntro(now) {
-        const elapsed = now - introStart;
-        const t       = Math.min(elapsed / INTRO_DURATION, 1);
-        const eased   = 1 - Math.pow(1 - t, 3);
+        // Visible half-height at the globe's depth (~2.69 world units)
+        const HALF_H = Math.tan((camera.fov / 2) * Math.PI / 180) * camera.position.z;
+        // Portrait screens are narrow, so the globe gets its own size/position so it fits and stays centred
+        function profile() {
+            if (camera.aspect < 1) {
+                const halfW = HALF_H * camera.aspect;
+                return { rest: 0.45, restY: -1.35, peak: Math.min(1.2, halfW * 0.82) };
+            }
+            return { rest: 0.4, restY: -1.2, peak: 1.2 };
+        }
 
-        if (isMobile()) {
-            // On mobile: intro to a fixed resting state, no scroll driving
-            targetScale    = 0.1 + (0.4 - 0.1) * eased;   // slightly larger resting size on mobile
-            targetY        = -3.0 + (-0.3 + 2.0) * eased;  // closer to center
+        let targetScale = 0.1, targetY = profile().restY - 0.8, targetOpacity = 0, targetRotSpeed = 0.004;
+        globeGroup.scale.setScalar(0.1);
+        globeGroup.position.y = targetY;
+
+        // ---- Intro (all devices) ----
+        const INTRO_DURATION = 1800;
+        const introStart = performance.now();
+        let introComplete = false;
+        function runIntro(now) {
+            const t = Math.min((now - introStart) / INTRO_DURATION, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            const pr = profile();
+            targetScale    = 0.1 + (pr.rest - 0.1) * eased;
+            targetY        = (pr.restY - 0.8) + 0.8 * eased;
             targetOpacity  = eased;
-            targetRotSpeed = 0.006;                          // steady gentle rotation
-        } else {
-            targetScale    = 0.1 + (0.4 - 0.1) * eased;
-            targetY        = -2.0 + (-1.2 + 2.0) * eased;
-            targetOpacity  = eased;
-            targetRotSpeed = 0.003;
+            targetRotSpeed = 0.004;
+            setHeroFade(eased, 20 * (1 - eased));
+            if (t >= 1) { introComplete = true; onHeroScroll(); }
         }
 
-        heroContent.style.opacity   = eased;
-        heroContent.style.transform = `translateY(${20 * (1 - eased)}px)`;
-        if (logo)  logo.style.opacity  = eased;
-        if (Mlogo) Mlogo.style.opacity = eased;
+        // ---- Scroll story (now on mobile too, with a shorter scroll distance set in CSS) ----
+        function onHeroScroll() {
+            if (!introComplete) return;
+            const scrollable = heroContainer.offsetHeight - heroWrap.offsetHeight;
+            if (scrollable <= 0) return;
+            const sp = Math.min(Math.max(-heroContainer.getBoundingClientRect().top / scrollable, 0), 1);
+            const pr = profile();
 
-        if (t >= 1) introComplete = true;
-    }
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    // SCROLL only on desktop (>980px)
-    window.addEventListener('scroll', () => {
-        if (!introComplete) return;
-        if (isMobile()) return;  // ← MOBILE: skip all scroll-driven globe changes
-
-        const st = window.scrollY;
-        const scrollableDistance = heroContainer.offsetHeight - window.innerHeight;
-        if (scrollableDistance <= 0) return;
-
-        const scrollProgress = Math.min(Math.max(st / scrollableDistance, 0), 1);
-
-        if (scrollProgress < 0.3) {
-            const p = scrollProgress / 0.3;
-            targetScale    = 0.4 + 0.8 * p;
-            targetY        = -1.2 + 1.2 * p;
-            targetOpacity  = 1.0;
-            targetRotSpeed = 0.003 + 0.01 * p;
-            heroContent.style.opacity   = 1 - p;
-            heroContent.style.transform = `translateY(${-30 * p}px)`;
-            if (logo)  logo.style.opacity  = 1 - p;
-            if (Mlogo) Mlogo.style.opacity = 1 - p;
+            if (sp < 0.3) {
+                const p = sp / 0.3;
+                targetScale    = pr.rest + (pr.peak - pr.rest) * p;
+                targetY        = pr.restY * (1 - p);
+                targetOpacity  = 1;
+                targetRotSpeed = 0.004 + 0.01 * p;
+                setHeroFade(1 - p, -30 * p);
+            } else if (sp < 0.8) {
+                const p = (sp - 0.3) / 0.5;
+                targetScale    = pr.peak;
+                targetY        = 0;
+                targetOpacity  = 1;
+                targetRotSpeed = 0.014 + 0.1 * p;
+                setHeroFade(0, -30);
+            } else {
+                const p = (sp - 0.8) / 0.2;
+                const e = 1 - Math.pow(1 - p, 2);
+                targetScale    = pr.peak * (1 - e);
+                targetY        = e;
+                targetOpacity  = 1 - e;
+                targetRotSpeed = 0.114;
+                setHeroFade(0, -30);
+            }
         }
-        else if (scrollProgress < 0.8) {
-            const p = (scrollProgress - 0.3) / 0.5;
-            targetScale    = 1.2;
-            targetY        = 0;
-            targetOpacity  = 1.0;
-            targetRotSpeed = 0.013 + 0.1 * p;
-            heroContent.style.opacity = 0;
-            if (logo)  logo.style.opacity  = 0;
-            if (Mlogo) Mlogo.style.opacity = 0;
+        window.addEventListener('scroll', onHeroScroll, { passive: true });
+        if ('ResizeObserver' in window) new ResizeObserver(() => { if (sizeGlobe()) onHeroScroll(); }).observe(heroWrap);
+        else window.addEventListener('resize', () => { if (sizeGlobe()) onHeroScroll(); });
+
+        // ---- Touch: swipe sideways on the hero to spin the globe (with inertia) ----
+        let tX = null, tY = null, dragging = false, spinVel = 0;
+        heroWrap.addEventListener('touchstart', e => {
+            if (e.touches.length !== 1) { tX = null; return; }
+            tX = e.touches[0].clientX; tY = e.touches[0].clientY; dragging = false;
+        }, { passive: true });
+        heroWrap.addEventListener('touchmove', e => {
+            if (tX === null) return;
+            const t = e.touches[0];
+            const dx = t.clientX - tX, dy = t.clientY - tY;
+            if (!dragging) {
+                if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+                if (Math.abs(dy) >= Math.abs(dx)) { tX = null; return; }   // vertical = normal page scroll
+                dragging = true;
+                if (hint) hint.classList.add('is-hidden');
+            }
+            const delta = dx * 0.01;
+            globeGroup.rotation.y += delta;
+            spinVel = Math.max(-0.3, Math.min(0.3, delta * 0.6));
+            tX = t.clientX; tY = t.clientY;
+        }, { passive: true });
+        const endTouch = () => { tX = null; dragging = false; };
+        heroWrap.addEventListener('touchend', endTouch, { passive: true });
+        heroWrap.addEventListener('touchcancel', endTouch, { passive: true });
+
+        // ---- Render loop: frame-rate independent, paused when the hero is off screen ----
+        let heroVisible = true, lastT = performance.now();
+        new IntersectionObserver(([entry]) => { heroVisible = entry.isIntersecting; }, { rootMargin: '150px 0px' }).observe(heroContainer);
+
+        function animate(now) {
+            requestAnimationFrame(animate);
+            const dt = Math.max(0, Math.min(now - lastT, 100));
+            lastT = now;
+            if (!introComplete) runIntro(now);
+            if (!heroVisible) return;
+
+            const k = dt / (1000 / 60);           // 1.0 at 60fps
+            const a = 1 - Math.pow(0.92, k);      // same easing feel at any frame rate
+            globeGroup.scale.setScalar(globeGroup.scale.x + (targetScale - globeGroup.scale.x) * a);
+            globeGroup.position.y      += (targetY - globeGroup.position.y) * a;
+            wireframe.material.opacity += (targetOpacity * 0.7 - wireframe.material.opacity) * a;
+            core.material.opacity      += (targetOpacity * 0.1 - core.material.opacity) * a;
+            particles.material.opacity += (targetOpacity * 0.6 - particles.material.opacity) * a;
+
+            globeGroup.rotation.y += (targetRotSpeed + (dragging ? 0 : spinVel)) * k;
+            globeGroup.rotation.x += targetRotSpeed * 0.2 * k;
+            if (!dragging) spinVel *= Math.pow(0.94, k);
+            particles.rotation.y  += 0.0005 * k;
+
+            renderer.render(scene, camera);
         }
-        else {
-            const p = (scrollProgress - 0.8) / 0.2;
-            const eased = 1 - Math.pow(1 - p, 2);
-            targetScale    = 1.2 * (1 - eased);
-            targetY        = eased;
-            targetOpacity  = 1.0 - eased;
-            targetRotSpeed = 0.113;
-            if (logo)  logo.style.opacity  = 0;
-            if (Mlogo) Mlogo.style.opacity = 0;
-        }
-    });
-
-  
-const FPS = isMobileDevice ? 20 : 60;
-const fpsInterval = 1000 / FPS;
-let lastFrameTime = 0;
-
-function animate(now) {
-    requestAnimationFrame(animate);
-
-    if (now - lastFrameTime < fpsInterval) return;
-    lastFrameTime = now;
-
-    if (!introComplete) runIntro(now);
-
-    if (introComplete && isMobile()) {
-        targetRotSpeed = 0.006;
-        targetOpacity  = 1.0;
-    }
-
-    globeGroup.scale.x         += (targetScale   - globeGroup.scale.x)        * 0.08;
-    globeGroup.scale.y         += (targetScale   - globeGroup.scale.y)        * 0.08;
-    globeGroup.scale.z         += (targetScale   - globeGroup.scale.z)        * 0.08;
-    globeGroup.position.y      += (targetY       - globeGroup.position.y)     * 0.08;
-    wireframe.material.opacity += (targetOpacity * 0.7 - wireframe.material.opacity) * 0.08;
-    core.material.opacity      += (targetOpacity * 0.1 - core.material.opacity)      * 0.08;
-    particles.material.opacity += (targetOpacity * 0.6 - particles.material.opacity) * 0.08;
-
-    globeGroup.rotation.y += targetRotSpeed;
-    globeGroup.rotation.x += targetRotSpeed * 0.2;
-    particles.rotation.y  += 0.0005;
-
-    renderer.render(scene, camera);
-}
-animate(performance.now());
+        requestAnimationFrame(animate);
+    })();
 
     // ===== TYPING =====
     const words = [
-        {line1:"E-COMMERCE",line2:"MANAGEMENT"},
-        {line1:"WEB",line2:"DEVELOPMENT"},
-        {line1:"SOCIAL MEDIA",line2:"MANAGEMENT"},
-        {line1:"DIGITAL",line2:"MARKETING"},
-        {line1:"GRAPHIC",line2:"DESIGNING"},
-        {line1:"VIDEO",line2:"EDITING"}
+        { line1: "E-COMMERCE",   line2: "MANAGEMENT" },
+        { line1: "WEB",          line2: "DEVELOPMENT" },
+        { line1: "SOCIAL MEDIA", line2: "MANAGEMENT" },
+        { line1: "DIGITAL",      line2: "MARKETING" },
+        { line1: "GRAPHIC",      line2: "DESIGNING" },
+        { line1: "VIDEO",        line2: "EDITING" }
     ];
     const line1El = document.getElementById('line1');
     const line2El = document.getElementById('line2');
-    let wordIndex=0,charIndex=0,currentLine=1,isDeleting=false,isPaused=false;
+    let wordIndex = 0, charIndex = 0, currentLine = 1, isDeleting = false, isPaused = false;
     function type() {
-        const cws=words[wordIndex]; let currentText=currentLine===1?cws.line1:cws.line2; let targetEl=currentLine===1?line1El:line2El;
-        if(isPaused){setTimeout(type,2000);isPaused=false;isDeleting=true;currentLine=2;return;}
-        if(isDeleting){targetEl=currentLine===1?line1El:line2El;currentText=currentLine===1?cws.line1:cws.line2;if(targetEl.innerText.length>0){targetEl.innerText=currentText.substring(0,targetEl.innerText.length-1);setTimeout(type,50);}else{if(currentLine===2){currentLine=1;setTimeout(type,50);}else{isDeleting=false;wordIndex=(wordIndex+1)%words.length;currentLine=1;setTimeout(type,100);}}}
-        else{if(charIndex<currentText.length){targetEl.innerText=currentText.substring(0,charIndex+1);charIndex++;setTimeout(type,100);}else{charIndex=0;if(currentLine===1){currentLine=2;setTimeout(type,100);}else{isPaused=true;setTimeout(type,2000);}}}
+        const cws = words[wordIndex];
+        let currentText = currentLine === 1 ? cws.line1 : cws.line2;
+        let targetEl = currentLine === 1 ? line1El : line2El;
+        if (isPaused) { setTimeout(type, 2000); isPaused = false; isDeleting = true; currentLine = 2; return; }
+        if (isDeleting) {
+            targetEl = currentLine === 1 ? line1El : line2El;
+            currentText = currentLine === 1 ? cws.line1 : cws.line2;
+            if (targetEl.innerText.length > 0) {
+                targetEl.innerText = currentText.substring(0, targetEl.innerText.length - 1);
+                setTimeout(type, 50);
+            } else if (currentLine === 2) {
+                currentLine = 1; setTimeout(type, 50);
+            } else {
+                isDeleting = false; wordIndex = (wordIndex + 1) % words.length; currentLine = 1; setTimeout(type, 100);
+            }
+        } else {
+            if (charIndex < currentText.length) {
+                targetEl.innerText = currentText.substring(0, charIndex + 1); charIndex++; setTimeout(type, 100);
+            } else {
+                charIndex = 0;
+                if (currentLine === 1) { currentLine = 2; setTimeout(type, 100); }
+                else { isPaused = true; setTimeout(type, 2000); }
+            }
+        }
     }
-    document.addEventListener("DOMContentLoaded", () => { type(); updateSlidesPerView(); });
-    
+    document.addEventListener('DOMContentLoaded', type);
+
     // ===== PROGRESS BAR =====
-const progressBar = document.getElementById('progressBar');
-window.addEventListener('scroll', () => {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    progressBar.style.width = progress + '%';
-});
+    const progressBar = document.getElementById('progressBar');
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+    }, { passive: true });
 
-    // ===== CURSOR =====
-    const cursorEl = document.getElementById('cursor');
-    const cursorDot = document.getElementById('cursorDot');
-    let cursorX=0,cursorY=0,dotX=0,dotY=0;
-    document.addEventListener('mousemove', e=>{ cursorX=e.clientX; cursorY=e.clientY; });
-    function animateCursor(){ dotX+=(cursorX-dotX)*0.15;dotY+=(cursorY-dotY)*0.15;cursorEl.style.left=(cursorX-10)+'px';cursorEl.style.top=(cursorY-10)+'px';cursorDot.style.left=(dotX-3)+'px';cursorDot.style.top=(dotY-3)+'px';requestAnimationFrame(animateCursor); }
-    animateCursor();
+    // ===== CURSOR (only on devices with a real pointer) =====
+    if (canHover) {
+        const cursorEl = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursorDot');
+        let cursorX = 0, cursorY = 0, dotX = 0, dotY = 0;
+        document.addEventListener('mousemove', e => { cursorX = e.clientX; cursorY = e.clientY; });
+        (function animateCursor() {
+            dotX += (cursorX - dotX) * 0.15; dotY += (cursorY - dotY) * 0.15;
+            cursorEl.style.left = (cursorX - 10) + 'px'; cursorEl.style.top = (cursorY - 10) + 'px';
+            cursorDot.style.left = (dotX - 3) + 'px'; cursorDot.style.top = (dotY - 3) + 'px';
+            requestAnimationFrame(animateCursor);
+        })();
+    }
 
-    // ===== SPARKS =====
-     const sparkCanvas = document.getElementById('sparkCanvas');
-     const sCtx = sparkCanvas.getContext('2d');
-     let sparks = [];
-     const colors = ['#00f5ff','#ff00aa','#ffee00'];
-     function resizeSpark(){ sparkCanvas.width=window.innerWidth; sparkCanvas.height=window.innerHeight; }
-     resizeSpark(); window.addEventListener('resize', resizeSpark);
-     class Spark { constructor(x,y){ this.x=x;this.y=y;const a=Math.random()*Math.PI*2,sp=Math.random()*8+4;this.vx=Math.cos(a)*sp;this.vy=Math.sin(a)*sp;this.life=1;this.decay=Math.random()*0.03+0.02;this.color=colors[Math.floor(Math.random()*colors.length)];this.size=Math.random()*4+2; } update(){ this.x+=this.vx;this.y+=this.vy;this.vy+=0.15;this.vx*=0.98;this.vy*=0.98;this.life-=this.decay; } draw(){ if(this.life<=0)return;sCtx.save();sCtx.globalAlpha=this.life;sCtx.fillStyle=this.color;sCtx.shadowBlur=15;sCtx.shadowColor=this.color;sCtx.beginPath();sCtx.arc(this.x,this.y,Math.max(0.1,this.size*this.life),0,Math.PI*2);sCtx.fill();sCtx.restore(); } }
-     function animateSparks(){ sCtx.clearRect(0,0,sparkCanvas.width,sparkCanvas.height);sparks=sparks.filter(s=>s.life>0);sparks.forEach(s=>{s.update();s.draw();});requestAnimationFrame(animateSparks); }
-     animateSparks();
-    //  document.addEventListener('click', e=>{ for(let i=0;i<40;i++) sparks.push(new Spark(e.clientX,e.clientY)); });
-document.addEventListener('click', e=>{ 
-  const count = window.innerWidth <= 768 ? 10 : 40;
-  for(let i=0;i<count;i++) sparks.push(new Spark(e.clientX,e.clientY)); 
-});
-    
-    // ===== SCROLLYTELLING CANVAS =====
-    (function(){
+    // ===== SPARKS (loop only runs while sparks exist) =====
+    const sparkCanvas = document.getElementById('sparkCanvas');
+    const sCtx = sparkCanvas.getContext('2d');
+    let sparks = [], sparkRunning = false;
+    const colors = ['#00f5ff', '#ff00aa', '#ffee00'];
+    function resizeSpark() { sparkCanvas.width = window.innerWidth; sparkCanvas.height = window.innerHeight; }
+    resizeSpark(); window.addEventListener('resize', resizeSpark);
+    class Spark {
+        constructor(x, y) { this.x = x; this.y = y; const a = Math.random() * Math.PI * 2, sp = Math.random() * 8 + 4; this.vx = Math.cos(a) * sp; this.vy = Math.sin(a) * sp; this.life = 1; this.decay = Math.random() * 0.03 + 0.02; this.color = colors[Math.floor(Math.random() * colors.length)]; this.size = Math.random() * 4 + 2; }
+        update() { this.x += this.vx; this.y += this.vy; this.vy += 0.15; this.vx *= 0.98; this.vy *= 0.98; this.life -= this.decay; }
+        draw() { if (this.life <= 0) return; sCtx.save(); sCtx.globalAlpha = this.life; sCtx.fillStyle = this.color; sCtx.shadowBlur = 15; sCtx.shadowColor = this.color; sCtx.beginPath(); sCtx.arc(this.x, this.y, Math.max(0.1, this.size * this.life), 0, Math.PI * 2); sCtx.fill(); sCtx.restore(); }
+    }
+    function animateSparks() {
+        sCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
+        sparks = sparks.filter(s => s.life > 0);
+        sparks.forEach(s => { s.update(); s.draw(); });
+        if (sparks.length) requestAnimationFrame(animateSparks);
+        else { sparkRunning = false; sCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height); }
+    }
+    document.addEventListener('click', e => {
+        const count = window.innerWidth <= 768 ? 10 : 40;
+        for (let i = 0; i < count; i++) sparks.push(new Spark(e.clientX, e.clientY));
+        if (!sparkRunning) { sparkRunning = true; requestAnimationFrame(animateSparks); }
+    });
+
+    // ================================================================
+    //  SCROLLYTELLING CANVAS
+    // ================================================================
+    (function () {
+        const container = document.getElementById('about');
         const sc = document.getElementById('scrollyCanvas');
+        if (!container || !sc) return;
         const c = sc.getContext('2d');
-        const container = document.getElementById('scrolly-section');
-        function resize(){ sc.width=container.offsetWidth; sc.height=container.offsetHeight; }
-        resize(); window.addEventListener('resize', resize);
+        const useGlow = !isMobileDevice;   // canvas shadowBlur is the most expensive part on phones
+
+        let W = 0, H = 0;
+        function resize() {
+            const w = sc.clientWidth, h = sc.clientHeight;
+            if (!w || !h) return;
+            const dpr = Math.min(window.devicePixelRatio || 1, isMobileDevice ? 1.5 : 2);
+            W = w; H = h;
+            sc.width = Math.round(w * dpr); sc.height = Math.round(h * dpr);
+            c.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resize();
+        if ('ResizeObserver' in window) new ResizeObserver(resize).observe(sc);
+        else window.addEventListener('resize', resize);
 
         const SCENES = {
-            intro:     { c1:'#00f5ff', c2:'#003366', rings:1, glow:0.25, label:'// SECTOR 7G — SILENCE //',       hudTL:'SYS: MONITORING\nFREQ: 7G.441\nSTATUS: IDLE',   },
-            discovery: { c1:'#00f5ff', c2:'#ff00aa', rings:2, glow:0.55, label:'// ANOMALY — SIGNAL DETECTED //', hudTL:'SYS: ANOMALY\nFREQ: STRUCTURED\nSTATUS: PULSE', },
-            conflict:  { c1:'#ff00aa', c2:'#ffee00', rings:3, glow:0.85, label:'// DECRYPTION IN PROGRESS //',    hudTL:'SYS: ALERT\nFREQ: ENCRYPTED\nSTATUS: DANGER',   },
-            transcend: { c1:'#ffee00', c2:'#00f5ff', rings:5, glow:1.0,  label:'// SIGNAL RESOLVED — EVOLVED //',hudTL:'SYS: LINK ACTIVE\nFREQ: NEURAL\nSTATUS: LIVE',   },
+            intro:     { c1:'#00f5ff', c2:'#003366', rings:1, glow:0.25, label:'// SECTOR 7G — SILENCE //',       hudTL:'SYS: MONITORING\nFREQ: 7G.441\nSTATUS: IDLE' },
+            discovery: { c1:'#00f5ff', c2:'#ff00aa', rings:2, glow:0.55, label:'// ANOMALY — SIGNAL DETECTED //', hudTL:'SYS: ANOMALY\nFREQ: STRUCTURED\nSTATUS: PULSE' },
+            conflict:  { c1:'#ff00aa', c2:'#ffee00', rings:3, glow:0.85, label:'// DECRYPTION IN PROGRESS //',    hudTL:'SYS: ALERT\nFREQ: ENCRYPTED\nSTATUS: DANGER' },
+            transcend: { c1:'#ffee00', c2:'#00f5ff', rings:5, glow:1.0,  label:'// SIGNAL RESOLVED — EVOLVED //', hudTL:'SYS: LINK ACTIVE\nFREQ: NEURAL\nSTATUS: LIVE' },
         };
         const SCENE_IMG = {
             intro:     { caption:'// SECTOR 7G — SILENCE //',   border:'rgba(0,245,255,0.2)'  },
@@ -860,10 +1091,12 @@ document.addEventListener('click', e=>{
             conflict:  { caption:'// DECRYPTION IN PROGRESS //', border:'rgba(255,0,170,0.42)' },
             transcend: { caption:'// NEURAL LINK ACTIVE //',     border:'rgba(255,238,0,0.45)' },
         };
+        const scaleMap = { intro:0.95, discovery:1.1, conflict:1.2, transcend:1.45 };
+        const dotCount = { intro:18, discovery:45, conflict:75, transcend:120 };
 
-        let currentScene='intro', scrollProg=0, time=0, rotX=0, rotY=0;
+        let currentScene = 'intro', scrollProg = 0, time = 0, rotX = 0, rotY = 0, autoAngle = 0;
 
-        function buildIco(r){ const t=(1+Math.sqrt(5))/2;const raw=[[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]];const verts=raw.map(v=>{const l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);return[v[0]/l*r,v[1]/l*r,v[2]/l*r];});const faces=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];const edgeSet=new Set(),edges=[];faces.forEach(f=>{[[f[0],f[1]],[f[1],f[2]],[f[2],f[0]]].forEach(([a,b])=>{const k=Math.min(a,b)+'-'+Math.max(a,b);if(!edgeSet.has(k)){edgeSet.add(k);edges.push([a,b]);}});});return{verts,edges,faces}; }
+        function buildIco(r) { const t=(1+Math.sqrt(5))/2;const raw=[[-1,t,0],[1,t,0],[-1,-t,0],[1,-t,0],[0,-1,t],[0,1,t],[0,-1,-t],[0,1,-t],[t,0,-1],[t,0,1],[-t,0,-1],[-t,0,1]];const verts=raw.map(v=>{const l=Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);return[v[0]/l*r,v[1]/l*r,v[2]/l*r];});const faces=[[0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],[1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],[3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],[4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]];const edgeSet=new Set(),edges=[];faces.forEach(f=>{[[f[0],f[1]],[f[1],f[2]],[f[2],f[0]]].forEach(([a,b])=>{const k=Math.min(a,b)+'-'+Math.max(a,b);if(!edgeSet.has(k)){edgeSet.add(k);edges.push([a,b]);}});});return{verts,edges,faces}; }
         const rxf=(p,a)=>{const[x,y,z]=p,cs=Math.cos(a),sn=Math.sin(a);return[x,y*cs-z*sn,y*sn+z*cs];};
         const ryf=(p,a)=>{const[x,y,z]=p,cs=Math.cos(a),sn=Math.sin(a);return[x*cs+z*sn,y,-x*sn+z*cs];};
         const rzf=(p,a)=>{const[x,y,z]=p,cs=Math.cos(a),sn=Math.sin(a);return[x*cs-y*sn,x*sn+y*cs,z];};
@@ -872,175 +1105,290 @@ document.addEventListener('click', e=>{
         const rgba=(h,a)=>{const[r,g,b]=h2r(h);return`rgba(${r},${g},${b},${a})`;};
         const ah=(h,a)=>h+Math.round(Math.max(0,Math.min(255,a*255))).toString(16).padStart(2,'0');
 
-        class Dot{ constructor(r){this.r=r*(0.9+Math.random()*0.9);this.theta=Math.random()*Math.PI*2;this.phi=Math.acos(2*Math.random()-1);this.spd=(Math.random()*0.005+0.002)*(Math.random()<.5?1:-1);this.sz=Math.random()*2+0.5;this.op=Math.random()*0.6+0.3;} tick(e){this.theta+=this.spd+e*0.003;} xyz(){return[this.r*Math.sin(this.phi)*Math.cos(this.theta),this.r*Math.sin(this.phi)*Math.sin(this.theta),this.r*Math.cos(this.phi)];} }
-        const DOTS = Array.from({length: isMobileDevice ? 20 : 120}, () => new Dot(100));
-
-        // Mobile detection for scrollytelling canvas
+        class Dot { constructor(r){this.r=r*(0.9+Math.random()*0.9);this.theta=Math.random()*Math.PI*2;this.phi=Math.acos(2*Math.random()-1);this.spd=(Math.random()*0.005+0.002)*(Math.random()<.5?1:-1);this.sz=Math.random()*2+0.5;this.op=Math.random()*0.6+0.3;} tick(e){this.theta+=this.spd+e*0.003;} xyz(){return[this.r*Math.sin(this.phi)*Math.cos(this.theta),this.r*Math.sin(this.phi)*Math.sin(this.theta),this.r*Math.cos(this.phi)];} }
+        const DOTS = Array.from({ length: isMobileDevice ? 40 : 120 }, () => new Dot(100));
         const isMob = () => window.innerWidth <= 980;
 
-        // Auto-rotating angle for mobile (not driven by scroll)
-        let mobileAutoAngle = 0;
+        let visible = false, running = false;
+        function drawFrame() {
+            if (!visible) { running = false; return; }
+            if (!W || !H) resize();
+            if (!W || !H) { requestAnimationFrame(drawFrame); return; }
 
-        function drawFrame(){
-            const W=sc.width,H=sc.height;
-            const rect=container.getBoundingClientRect();
-            const viewH=window.innerHeight;
-            const cx=W/2;
+            // Canvas is sticky and viewport-sized, so the shape is simply drawn in its centre
+            const cx = W / 2, cy = H / 2;
+            const scn = SCENES[currentScene];
+            const baseR = Math.min(W, H) * 0.22 * scaleMap[currentScene];
 
-          const containerScrolled = Math.max(0, -rect.top);
-const cy = containerScrolled + viewH / 2;
+            // Scroll drives rotation everywhere; phones also get a gentle auto-spin on top
+            const mob = isMob();
+            if (mob) autoAngle += 0.006;
+            rotX += (scrollProg * Math.PI * 2.8 - rotX) * 0.05;
+            rotY += (scrollProg * Math.PI * 4.2 - rotY) * 0.05;
+            const wx = Math.sin(time * 0.35) * 0.04, wy = Math.cos(time * 0.28) * 0.04;
+            const fRX = rotX + wx + (mob ? Math.sin(autoAngle * 0.7) * 0.4 : 0);
+            const fRY = rotY + wy + (mob ? autoAngle : 0);
+            const fRZ = scrollProg * Math.PI * 0.6 + (mob ? autoAngle * 0.15 : 0);
 
+            c.clearRect(0, 0, W, H);
+            const grd = c.createRadialGradient(cx, cy, 0, cx, cy, baseR * 2.2);
+            grd.addColorStop(0, rgba(scn.c1, scn.glow * 0.07)); grd.addColorStop(1, 'rgba(5,5,10,0)');
+            c.fillStyle = grd; c.fillRect(0, 0, W, H);
 
+            const geo = buildIco(baseR);
+            const tV = geo.verts.map(v => { let p = rxf(v, fRX); p = ryf(p, fRY); return rzf(p, fRZ); });
+            const pV = tV.map(v => pj(v, cx, cy));
 
-
-
-            const scn=SCENES[currentScene];
-            const scaleMap={intro:0.95,discovery:1.1,conflict:1.2,transcend:1.45};
-            const baseR=Math.min(W,viewH)*0.22*scaleMap[currentScene];
-
-            if (isMob()) {
-                // Mobile: auto-rotate smoothly, no scroll influence
-                mobileAutoAngle += 0.008;
-                rotX = Math.sin(mobileAutoAngle * 0.7) * 0.6;
-                rotY = mobileAutoAngle;
-            } else {
-                rotX+=(scrollProg*Math.PI*2.8-rotX)*0.05;
-                rotY+=(scrollProg*Math.PI*4.2-rotY)*0.05;
-            }
-
-            const wx=Math.sin(time*0.35)*0.04,wy=Math.cos(time*0.28)*0.04;
-            const fRX=rotX+wx,fRY=rotY+wy,fRZ= isMob() ? mobileAutoAngle * 0.15 : scrollProg*Math.PI*0.6;
-
-            c.clearRect(0,0,W,H);
-            const grd=c.createRadialGradient(cx,cy,0,cx,cy,baseR*2.2);
-            grd.addColorStop(0,rgba(scn.c1,scn.glow*0.07)); grd.addColorStop(1,'rgba(5,5,10,0)');
-            c.fillStyle=grd; c.fillRect(0,0,W,H);
-
-            const geo=buildIco(baseR);
-            const tV=geo.verts.map(v=>{let p=rxf(v,fRX);p=ryf(p,fRY);return rzf(p,fRZ);});
-            const pV=tV.map(v=>pj(v,cx,cy));
-
-            for(let ri=0;ri<scn.rings;ri++){
-                const rR=baseR*(1.35+ri*0.3),
-                      tX=fRX*0.4+Math.sin(time*0.18+ri)*0.7,
-                      tY2=fRY*0.3+Math.cos(time*0.14+ri)*0.5,
-                      rA=time*(0.25+ri*0.08)+ri*1.2,
-                      al=0.12+ri*0.04,
-                      col=ri%2===0?scn.c1:scn.c2;
+            for (let ri = 0; ri < scn.rings; ri++) {
+                const rR = baseR * (1.35 + ri * 0.3),
+                      tX = fRX * 0.4 + Math.sin(time * 0.18 + ri) * 0.7,
+                      tY2 = fRY * 0.3 + Math.cos(time * 0.14 + ri) * 0.5,
+                      rA = time * (0.25 + ri * 0.08) + ri * 1.2,
+                      al = 0.12 + ri * 0.04,
+                      col = ri % 2 === 0 ? scn.c1 : scn.c2;
                 c.beginPath();
-                for(let i=0;i<=72;i++){
-                    const a=(i/72)*Math.PI*2+rA;
-                    let p3=[rR*Math.cos(a),rR*Math.sin(a),0];
-                    p3=rxf(p3,tX);p3=ryf(p3,tY2);
-                    const pp=pj(p3,cx,cy);
-                    i===0?c.moveTo(pp[0],pp[1]):c.lineTo(pp[0],pp[1]);
+                for (let i = 0; i <= 72; i++) {
+                    const a = (i / 72) * Math.PI * 2 + rA;
+                    let p3 = [rR * Math.cos(a), rR * Math.sin(a), 0];
+                    p3 = rxf(p3, tX); p3 = ryf(p3, tY2);
+                    const pp = pj(p3, cx, cy);
+                    i === 0 ? c.moveTo(pp[0], pp[1]) : c.lineTo(pp[0], pp[1]);
                 }
-                c.strokeStyle=ah(col,al);c.lineWidth=0.7;c.stroke();
+                c.strokeStyle = ah(col, al); c.lineWidth = 0.7; c.stroke();
             }
 
-            geo.faces.forEach(([a,b,cc])=>{
-                const avgZ=(tV[a][2]+tV[b][2]+tV[cc][2])/3,dt=(avgZ/baseR+1)/2;
-                c.beginPath();c.moveTo(pV[a][0],pV[a][1]);c.lineTo(pV[b][0],pV[b][1]);c.lineTo(pV[cc][0],pV[cc][1]);c.closePath();
-                c.fillStyle=rgba(dt>0.5?scn.c1:scn.c2,0.02+dt*0.04);c.fill();
+            geo.faces.forEach(([a, b, cc]) => {
+                const avgZ = (tV[a][2] + tV[b][2] + tV[cc][2]) / 3, dt = (avgZ / baseR + 1) / 2;
+                c.beginPath(); c.moveTo(pV[a][0], pV[a][1]); c.lineTo(pV[b][0], pV[b][1]); c.lineTo(pV[cc][0], pV[cc][1]); c.closePath();
+                c.fillStyle = rgba(dt > 0.5 ? scn.c1 : scn.c2, 0.02 + dt * 0.04); c.fill();
             });
 
-            geo.edges.forEach(([a,b])=>{
-                const avgZ=(tV[a][2]+tV[b][2])/2,dt=(avgZ/baseR+1)/2,al=0.2+dt*0.75,lw=0.6+dt*0.9;
-                const g2=c.createLinearGradient(pV[a][0],pV[a][1],pV[b][0],pV[b][1]);
-                g2.addColorStop(0,ah(scn.c1,al));g2.addColorStop(1,ah(scn.c2,al));
-                c.beginPath();c.moveTo(pV[a][0],pV[a][1]);c.lineTo(pV[b][0],pV[b][1]);
-                c.strokeStyle=g2;c.lineWidth=lw;c.shadowColor=scn.c1;c.shadowBlur=5*scn.glow;c.stroke();c.shadowBlur=0;
+            geo.edges.forEach(([a, b]) => {
+                const avgZ = (tV[a][2] + tV[b][2]) / 2, dt = (avgZ / baseR + 1) / 2, al = 0.2 + dt * 0.75, lw = 0.6 + dt * 0.9;
+                const g2 = c.createLinearGradient(pV[a][0], pV[a][1], pV[b][0], pV[b][1]);
+                g2.addColorStop(0, ah(scn.c1, al)); g2.addColorStop(1, ah(scn.c2, al));
+                c.beginPath(); c.moveTo(pV[a][0], pV[a][1]); c.lineTo(pV[b][0], pV[b][1]);
+                c.strokeStyle = g2; c.lineWidth = lw;
+                if (useGlow) { c.shadowColor = scn.c1; c.shadowBlur = 5 * scn.glow; }
+                c.stroke(); c.shadowBlur = 0;
             });
 
-            pV.forEach((p,i)=>{
-                const dt=(tV[i][2]/baseR+1)/2;
-                c.beginPath();c.arc(p[0],p[1],1.2+dt*2.5,0,Math.PI*2);
-                c.fillStyle=ah(scn.c1,0.35+dt*0.65);c.shadowColor=scn.c1;c.shadowBlur=8*scn.glow;c.fill();c.shadowBlur=0;
+            pV.forEach((p, i) => {
+                const dt = (tV[i][2] / baseR + 1) / 2;
+                c.beginPath(); c.arc(p[0], p[1], 1.2 + dt * 2.5, 0, Math.PI * 2);
+                c.fillStyle = ah(scn.c1, 0.35 + dt * 0.65);
+                if (useGlow) { c.shadowColor = scn.c1; c.shadowBlur = 8 * scn.glow; }
+                c.fill(); c.shadowBlur = 0;
             });
 
-            const dc={intro:18,discovery:45,conflict:75,transcend:120}[currentScene];
-            DOTS.slice(0,dc).forEach(d=>{
-                // On mobile use autoAngle as scroll substitute for dot movement
-                d.tick(isMob() ? 0.5 : scrollProg*6);
-                let p3=d.xyz().map(v=>v*(baseR/100));
-                let pp3=rxf(p3,fRX*0.55);pp3=ryf(pp3,fRY*0.65);
-                const pp=pj(pp3,cx,cy);
-                if(pp[2]<0)return;
-                const dt=(pp3[2]/baseR+1)/2;
-                c.beginPath();c.arc(pp[0],pp[1],d.sz*(0.4+dt*0.8),0,Math.PI*2);
-                c.fillStyle=dt>0.5?scn.c1:scn.c2;c.globalAlpha=d.op*dt*0.75;
-                c.shadowColor=dt>0.5?scn.c1:scn.c2;c.shadowBlur=5;c.fill();c.shadowBlur=0;c.globalAlpha=1;
+            DOTS.slice(0, dotCount[currentScene]).forEach(d => {
+                d.tick(scrollProg * 6 + (mob ? 0.5 : 0));
+                const p3 = d.xyz().map(v => v * (baseR / 100));
+                let pp3 = rxf(p3, fRX * 0.55); pp3 = ryf(pp3, fRY * 0.65);
+                const pp = pj(pp3, cx, cy);
+                if (pp[2] < 0) return;
+                const dt = (pp3[2] / baseR + 1) / 2;
+                c.beginPath(); c.arc(pp[0], pp[1], d.sz * (0.4 + dt * 0.8), 0, Math.PI * 2);
+                c.fillStyle = dt > 0.5 ? scn.c1 : scn.c2; c.globalAlpha = d.op * dt * 0.75;
+                if (useGlow) { c.shadowColor = dt > 0.5 ? scn.c1 : scn.c2; c.shadowBlur = 5; }
+                c.fill(); c.shadowBlur = 0; c.globalAlpha = 1;
             });
 
-            const hudTLel=document.getElementById('hudTL'),hudBCel=document.getElementById('hudBC');
-            if(hudTLel) hudTLel.innerHTML=scn.hudTL.replace(/\n/g,'<br>');
-            if(hudBCel) hudBCel.textContent=scn.label;
-
-            time+=0.016;
+            time += 0.016;
             requestAnimationFrame(drawFrame);
         }
-        drawFrame();
 
-        function switchScene(name){
-            currentScene=name;
-            const cfg=SCENE_IMG[name];
-            document.querySelectorAll('.scene-img').forEach(img=>{ img.classList.toggle('active',img.dataset.sceneImg===name); });
-            const cap=document.getElementById('sceneCaption'); if(cap) cap.textContent=cfg.caption;
-            const frame=document.getElementById('sceneFrame'); if(frame){ frame.style.borderColor=cfg.border; frame.style.boxShadow=`0 0 50px ${cfg.border}, 0 0 100px rgba(0,0,0,0.3)`; }
+        // Only draw while the section is on screen
+        new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting;
+            if (visible && !running) { running = true; requestAnimationFrame(drawFrame); }
+        }, { rootMargin: '100px 0px' }).observe(container);
+
+        function switchScene(name) {
+            currentScene = name;
+            const cfg = SCENE_IMG[name];
+            document.querySelectorAll('.scene-img').forEach(img => img.classList.toggle('active', img.dataset.sceneImg === name));
+            const cap = document.getElementById('sceneCaption'); if (cap) cap.textContent = cfg.caption;
+            const frame = document.getElementById('sceneFrame');
+            if (frame) { frame.style.borderColor = cfg.border; frame.style.boxShadow = `0 0 50px ${cfg.border}, 0 0 100px rgba(0,0,0,0.3)`; }
+            const hudTLel = document.getElementById('hudTL'), hudBCel = document.getElementById('hudBC');
+            if (hudTLel) hudTLel.innerHTML = SCENES[name].hudTL.replace(/\n/g, '<br>');
+            if (hudBCel) hudBCel.textContent = SCENES[name].label;
         }
 
-        const steps=document.querySelectorAll('.story-step');
-        const obs=new IntersectionObserver(entries=>{
-            entries.forEach(entry=>{
-                if(entry.isIntersecting&&entry.intersectionRatio>0.4){
-                    steps.forEach(s=>s.classList.remove('active'));
+        const steps = document.querySelectorAll('.story-step');
+        const stepObs = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > 0.4) {
+                    steps.forEach(s => s.classList.remove('active'));
                     entry.target.classList.add('active');
                     switchScene(entry.target.getAttribute('data-scene'));
                 }
             });
-        },{threshold:0.4,rootMargin:'-60px 0px -60px 0px'});
-        steps.forEach(s=>obs.observe(s));
-        if(steps.length) steps[0].classList.add('active');
+        }, { threshold: 0.4, rootMargin: '-60px 0px -60px 0px' });
+        steps.forEach(s => stepObs.observe(s));
+        if (steps.length) steps[0].classList.add('active');
 
-        // Scroll: only update scrollProg on desktop
-    window.addEventListener('scroll', () => {
-    if (!container) return;
-    const rect = container.getBoundingClientRect(), total = container.offsetHeight - window.innerHeight;
-    scrollProg = Math.max(0, Math.min(1, -rect.top / total));
-});
+        window.addEventListener('scroll', () => {
+            const rect = container.getBoundingClientRect(), total = container.offsetHeight - window.innerHeight;
+            scrollProg = total > 0 ? Math.max(0, Math.min(1, -rect.top / total)) : 0;
+        }, { passive: true });
     })();
 
-    // ===== CAROUSEL =====
-    const track = document.getElementById('reviewCarousel');
-    const slides = document.querySelectorAll('.carousel-slide');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const dotsContainer = document.getElementById('carouselDots');
-    let currentIndex=0, slidesPerView=1;
-    const totalSlides=slides.length;
-    function updateSlidesPerView(){ if(window.innerWidth>=1024)slidesPerView=3;else if(window.innerWidth>=640)slidesPerView=2;else slidesPerView=1;currentIndex=0;updateCarousel();generateDots(); }
-    function updateCarousel(){ const maxIndex=totalSlides-slidesPerView;if(currentIndex>maxIndex)currentIndex=maxIndex;if(currentIndex<0)currentIndex=0;track.style.transform=`translateX(-${currentIndex*(100/slidesPerView)}%)`;document.querySelectorAll('.carousel-dot').forEach((dot,i)=>{dot.classList.toggle('bg-[#00f5ff]',i===currentIndex);dot.classList.toggle('bg-gray-600',i!==currentIndex);}); }
-    function generateDots(){ dotsContainer.innerHTML='';const pages=totalSlides-slidesPerView+1;for(let i=0;i<pages;i++){const dot=document.createElement('button');dot.classList.add('carousel-dot','w-2','h-2','rounded-full','transition-colors','duration-300');dot.classList.add(i===0?'bg-[#00f5ff]':'bg-gray-600');dot.addEventListener('click',()=>{currentIndex=i;updateCarousel();});dotsContainer.appendChild(dot);} }
-    prevBtn.addEventListener('click',()=>{currentIndex--;updateCarousel();});
-    nextBtn.addEventListener('click',()=>{currentIndex++;updateCarousel();});
-    window.addEventListener('resize',updateSlidesPerView);
-    let touchStartX=0;
-    track.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
-    track.addEventListener('touchend',e=>{ const diff=touchStartX-e.changedTouches[0].clientX;if(Math.abs(diff)>50){if(diff>0)currentIndex++;else currentIndex--;updateCarousel();} },{passive:true});
+    // ================================================================
+    //  SELECTED WORKS: stacked cards on mobile
+    // ================================================================
+    (function () {
+        const grid = document.querySelector('.works-grid');
+        if (!grid) return;
+        const cards = Array.from(grid.children);
+        const mq = window.matchMedia('(max-width: 768px)');
+        let tops = [], heights = [], ticking = false;
+        cards.forEach((card, i) => card.style.setProperty('--i', i));
+
+        function measure() {
+            tops = cards.map(card => parseFloat(getComputedStyle(card).top) || 0);
+            heights = cards.map(card => card.offsetHeight || 1);
+        }
+        function reset() {
+            cards.forEach(card => { card.style.transform = ''; card.style.removeProperty('--dim'); });
+        }
+        function update() {
+            ticking = false;
+            if (!mq.matches) return;
+            // arrive[i]: 0 = card i is a full card-height away from its stuck position, 1 = stuck on the stack
+            const arrive = cards.map((card, i) => {
+                if (i === 0) return 0;
+                const dist = card.getBoundingClientRect().top - tops[i];
+                return 1 - Math.min(Math.max(dist / heights[i - 1], 0), 1);
+            });
+            // Each card shrinks and darkens by how many cards have landed on top of it
+            let depth = 0;
+            for (let i = cards.length - 1; i >= 0; i--) {
+                cards[i].style.transform = depth > 0.001 ? `scale(${(1 - depth * 0.045).toFixed(4)})` : '';
+                cards[i].style.setProperty('--dim', Math.min(depth * 0.22, 0.6).toFixed(3));
+                depth += arrive[i];
+            }
+        }
+        const requestUpdate = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', () => { if (mq.matches) { measure(); requestUpdate(); } });
+        const onMq = () => { if (mq.matches) { measure(); update(); } else reset(); };
+        if (mq.addEventListener) mq.addEventListener('change', onMq); else mq.addListener(onMq);
+        onMq();
+    })();
 
     // ================================================================
-    //  BOOKING MODAL — Supabase + Realtime + EmailJS + ICS
+    //  REVIEWS CAROUSEL
     // ================================================================
-    let pickedDate = null, pickedSlot = null;
-    const bmOverlay  = document.getElementById('bmOverlay');
-    const bmFormWrap = document.getElementById('bmFormWrap');
-    const bmSuccess  = document.getElementById('bmSuccess');
-    const bmForm     = document.getElementById('bmForm');
-    const bmSubmit   = document.getElementById('bmSubmit');
-    const bmDbError  = document.getElementById('bmDbError');
+    (function () {
+        const track = document.getElementById('reviewCarousel');
+        if (!track) return;
+        const slides = Array.from(track.querySelectorAll('.carousel-slide'));
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('carouselDots');
+        const PEEK_W = 86;   // must match .carousel-slide flex-basis under 640px
+        const total = slides.length;
+        let currentIndex = 0, slidesPerView = 1, lastWidth = window.innerWidth;
+
+        const maxIndex = () => Math.max(0, total - slidesPerView);
+        const offsetPct = () => slidesPerView === 1
+            ? currentIndex * PEEK_W - (100 - PEEK_W) / 2      // centre the slide, neighbours peek in
+            : currentIndex * (100 / slidesPerView);
+
+        function generateDots() {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i <= maxIndex(); i++) {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'carousel-dot';
+                dot.setAttribute('aria-label', `Show review ${i + 1}`);
+                dot.addEventListener('click', () => { currentIndex = i; updateCarousel(); });
+                dotsContainer.appendChild(dot);
+            }
+        }
+        function updateCarousel(dragPx = 0) {
+            currentIndex = Math.min(Math.max(currentIndex, 0), maxIndex());
+            track.style.transform = `translateX(calc(${(-offsetPct()).toFixed(3)}% + ${dragPx}px))`;
+            if (dragPx) return;
+            slides.forEach((s, i) => s.classList.toggle('is-active', i >= currentIndex && i < currentIndex + slidesPerView));
+            dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('on', i === currentIndex));
+        }
+        function updateSlidesPerView() {
+            slidesPerView = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1;
+            generateDots();
+            updateCarousel();
+        }
+
+        prevBtn.addEventListener('click', () => { currentIndex--; updateCarousel(); });
+        nextBtn.addEventListener('click', () => { currentIndex++; updateCarousel(); });
+        // Only react to real width changes: phones fire "resize" whenever the URL bar shows/hides
+        window.addEventListener('resize', () => {
+            if (window.innerWidth === lastWidth) return;
+            lastWidth = window.innerWidth;
+            updateSlidesPerView();
+        });
+
+        // Swipe that follows the finger, with resistance at the ends
+        let sx = 0, sy = 0, dx = 0, axis = null;
+        track.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; axis = null; }, { passive: true });
+        track.addEventListener('touchmove', e => {
+            const x = e.touches[0].clientX, y = e.touches[0].clientY;
+            if (axis === null) {
+                if (Math.abs(x - sx) < 6 && Math.abs(y - sy) < 6) return;
+                axis = Math.abs(x - sx) > Math.abs(y - sy) ? 'x' : 'y';
+                if (axis === 'x') track.style.transition = 'none';
+            }
+            if (axis !== 'x') return;
+            dx = x - sx;
+            const atEdge = (currentIndex === 0 && dx > 0) || (currentIndex === maxIndex() && dx < 0);
+            updateCarousel(atEdge ? dx * 0.3 : dx);
+        }, { passive: true });
+        function endSwipe() {
+            if (axis === 'x') {
+                track.style.transition = '';
+                const slideW = track.offsetWidth * (slidesPerView === 1 ? PEEK_W / 100 : 1 / slidesPerView);
+                if (dx < -slideW * 0.18) currentIndex++;
+                else if (dx > slideW * 0.18) currentIndex--;
+                updateCarousel();
+            }
+            axis = null; dx = 0;
+        }
+        track.addEventListener('touchend', endSwipe, { passive: true });
+        track.addEventListener('touchcancel', endSwipe, { passive: true });
+
+        updateSlidesPerView();
+    })();
+
+    // ================================================================
+    //  BOOKING MODAL: Supabase + Realtime + EmailJS + ICS
+    // ================================================================
+    let pickedDate = null, pickedSlot = null, bmBooked = false;
+    const bmOverlay    = document.getElementById('bmOverlay');
+    const bmFormWrap   = document.getElementById('bmFormWrap');
+    const bmSuccess    = document.getElementById('bmSuccess');
+    const bmForm       = document.getElementById('bmForm');
+    const bmSubmit     = document.getElementById('bmSubmit');
+    const bmDbError    = document.getElementById('bmDbError');
     const bmDbErrorMsg = document.getElementById('bmDbErrorMsg');
+    const slotEls      = Array.from(document.querySelectorAll('#slotsGrid .bm-slot'));
+    const openSlots    = slotEls.filter(s => !s.classList.contains('na'));
+    const fmtDate = d => d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const pad2 = n => String(n).padStart(2, '0');
+    const escapeHtml = s => String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 
+    function resetBooking() {
+        bmForm.reset();
+        pickedDate = null; pickedSlot = null;
+        slotEls.forEach(s => s.classList.remove('sel', 'taken', 'past'));
+        document.getElementById('bmTopic').classList.remove('chosen');
+        document.getElementById('calChosen').textContent = 'No date selected yet';
+        bmDbError.classList.remove('show');
+        buildCal();
+    }
     window.bmOpen = () => {
+        if (bmBooked) { resetBooking(); bmBooked = false; }
         bmOverlay.classList.add('is-open');
         document.body.style.overflow = 'hidden';
         bmSuccess.classList.remove('show');
@@ -1065,7 +1413,7 @@ const cy = containerScrolled + viewH / 2;
         DW.forEach(d => { const e = document.createElement('div'); e.className = 'bm-cal-dow'; e.textContent = d; g.appendChild(e); });
         const first = new Date(cY, cM, 1).getDay();
         const days  = new Date(cY, cM + 1, 0).getDate();
-        const today = new Date(); today.setHours(0,0,0,0);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
         for (let i = 0; i < first; i++) { const e = document.createElement('div'); e.className = 'bm-cal-day emp'; g.appendChild(e); }
         for (let d = 1; d <= days; d++) {
             const date = new Date(cY, cM, d);
@@ -1080,12 +1428,12 @@ const cy = containerScrolled + viewH / 2;
                 el.addEventListener('click', () => {
                     pickedDate = date;
                     pickedSlot = null;
-                    document.querySelectorAll('.bm-slot').forEach(s => s.classList.remove('sel'));
+                    slotEls.forEach(s => s.classList.remove('sel'));
                     g.querySelectorAll('.bm-cal-day').forEach(x => x.classList.remove('sel'));
                     el.classList.add('sel');
-                    document.getElementById('calChosen').textContent =
-                        '// ' + date.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase() + ' //';
+                    document.getElementById('calChosen').textContent = '// ' + fmtDate(date).toUpperCase() + ' //';
                     document.getElementById('eDate').classList.remove('show');
+                    markPastSlots(date);
                     loadBookedSlots(date);
                 });
             }
@@ -1096,61 +1444,66 @@ const cy = containerScrolled + viewH / 2;
     document.getElementById('calPrev').addEventListener('click', () => { cM--; if (cM < 0) { cM = 11; cY--; } buildCal(); });
     document.getElementById('calNext').addEventListener('click', () => { cM++; if (cM > 11) { cM = 0; cY++; } buildCal(); });
 
+    // Today: slots that already passed (or start within the hour) can't be booked
+    function markPastSlots(date) {
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        openSlots.forEach(s => {
+            const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), +s.dataset.h, +s.dataset.m);
+            s.classList.toggle('past', isToday && start.getTime() - now.getTime() < 60 * 60 * 1000);
+        });
+    }
+
     async function loadBookedSlots(date) {
-        const dateStr = date.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-        document.querySelectorAll('#slotsGrid .bm-slot:not(.na)').forEach(s => {
-            s.classList.remove('taken', 'sel');
-            s.style.opacity = '0.4';
-            s.style.pointerEvents = 'none';
-        });
-        const { data, error } = await _supabase.from('bookings').select('time_slot').eq('date', dateStr);
-        document.querySelectorAll('#slotsGrid .bm-slot:not(.na)').forEach(s => {
-            s.style.opacity = '';
-            s.style.pointerEvents = '';
-        });
+        const dateStr = fmtDate(date);
+        openSlots.forEach(s => { s.classList.remove('taken'); s.style.opacity = '0.4'; s.style.pointerEvents = 'none'; });
+        let data = null, error = null;
+        if (_supabase) {
+            const res = await _supabase.from('bookings').select('time_slot').eq('date', dateStr);
+            data = res.data; error = res.error;
+        }
+        openSlots.forEach(s => { s.style.opacity = ''; s.style.pointerEvents = ''; });
         if (error) { console.warn('Could not load slots:', error.message); return; }
+        if (!pickedDate || fmtDate(pickedDate) !== dateStr) return;   // user picked another day meanwhile
         const booked = new Set((data || []).map(r => r.time_slot));
-        document.querySelectorAll('#slotsGrid .bm-slot:not(.na)').forEach(s => {
-            const label = s.dataset.label;
-            if (booked.has(label)) {
-                s.classList.add('taken');
+        openSlots.forEach(s => {
+            const isTaken = booked.has(s.dataset.label);
+            s.classList.toggle('taken', isTaken);
+            if (isTaken) {
                 s.classList.remove('sel');
-                if (pickedSlot && pickedSlot.label === label) pickedSlot = null;
-            } else {
-                s.classList.remove('taken');
+                if (pickedSlot && pickedSlot.label === s.dataset.label) pickedSlot = null;
             }
         });
     }
 
-    _supabase.channel('bookings-realtime').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, payload => {
-        if (!pickedDate) return;
-        const newDateStr = payload.new.date;
-        const curDateStr = pickedDate.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-        if (newDateStr !== curDateStr) return;
-        const takenLabel = payload.new.time_slot;
-        document.querySelectorAll('#slotsGrid .bm-slot').forEach(s => {
-            if (s.dataset.label === takenLabel) {
-                s.classList.add('taken');
-                s.classList.remove('sel');
-                if (pickedSlot && pickedSlot.label === takenLabel) {
-                    pickedSlot = null;
-                    document.getElementById('eSlot').classList.add('show');
+    if (_supabase) {
+        _supabase.channel('bookings-realtime').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'bookings' }, payload => {
+            if (!pickedDate || payload.new.date !== fmtDate(pickedDate)) return;
+            const takenLabel = payload.new.time_slot;
+            slotEls.forEach(s => {
+                if (s.dataset.label === takenLabel) {
+                    s.classList.add('taken');
+                    s.classList.remove('sel');
+                    if (pickedSlot && pickedSlot.label === takenLabel) {
+                        pickedSlot = null;
+                        document.getElementById('eSlot').classList.add('show');
+                    }
                 }
-            }
-        });
-    }).subscribe();
+            });
+        }).subscribe();
+    }
 
-    document.querySelectorAll('#slotsGrid .bm-slot:not(.na)').forEach(s => {
+    openSlots.forEach(s => {
         s.addEventListener('click', () => {
-            if (s.classList.contains('taken')) return;
-            document.querySelectorAll('.bm-slot').forEach(x => x.classList.remove('sel'));
+            if (s.classList.contains('taken') || s.classList.contains('past')) return;
+            slotEls.forEach(x => x.classList.remove('sel'));
             s.classList.add('sel');
-            pickedSlot = { label: s.dataset.label, h: parseInt(s.dataset.h), m: parseInt(s.dataset.m) };
+            pickedSlot = { label: s.dataset.label, h: parseInt(s.dataset.h, 10), m: parseInt(s.dataset.m, 10) };
             document.getElementById('eSlot').classList.remove('show');
         });
     });
 
-    document.getElementById('bmTopic').addEventListener('change', function() { this.classList.add('chosen'); });
+    document.getElementById('bmTopic').addEventListener('change', function () { this.classList.add('chosen'); });
 
     function showE(id, inp) { document.getElementById(id).classList.add('show'); if (inp) { const el = document.getElementById(inp); if (el) el.classList.add('err'); } }
     function hideE(id) { document.getElementById(id).classList.remove('show'); }
@@ -1168,37 +1521,43 @@ const cy = containerScrolled + viewH / 2;
         return ok;
     }
 
+    // ICS text fields need commas, semicolons and newlines escaped
+    const icsEsc = s => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+
     function makeICS({ name, email, dateStr, timeLabel, topic, h, m, date }) {
-        function p(n) { return String(n).padStart(2, '0'); }
-        const yr=date.getFullYear(), mo=p(date.getMonth()+1), dy=p(date.getDate()), hh=p(h), mm=p(m);
-        const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, m + 45);
-        const uid = `winter-${Date.now()}-${Math.random().toString(36).slice(2)}@portfolio`;
-        const now = new Date();
-        const stamp = `${now.getFullYear()}${p(now.getMonth()+1)}${p(now.getDate())}T${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}`;
-        return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Winter Portfolio//EN','CALSCALE:GREGORIAN','METHOD:REQUEST',
+        const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, m);
+        const end   = new Date(start.getTime() + 45 * 60000);
+        const local = d => `${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}T${pad2(d.getHours())}${pad2(d.getMinutes())}00`;
+        const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+        const uid   = `lunax-${Date.now()}-${Math.random().toString(36).slice(2)}@lunaxmarketing.com`;
+        const cn    = String(name).replace(/[";:\\,]/g, '');
+        return [
+            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//LUNAX Marketing//Booking//EN', 'CALSCALE:GREGORIAN', 'METHOD:REQUEST',
             'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:${stamp}`,
-            `DTSTART:${yr}${mo}${dy}T${hh}${mm}00`,
-            `DTEND:${yr}${p(end.getMonth()+1)}${p(end.getDate())}T${p(end.getHours())}${p(end.getMinutes())}00`,
-            `SUMMARY:📅 Call with Winter — ${topic}`,
-            `DESCRIPTION:Hi ${name}!\\n\\nYour call is confirmed.\\nDate: ${dateStr}\\nTime: ${timeLabel}\\nTopic: ${topic}`,
-            `ORGANIZER;CN=Winter:mailto:${CFG.adminEmail}`,
-            `ATTENDEE;CN=${name};RSVP=TRUE:mailto:${email}`,
-            'STATUS:CONFIRMED','TRANSP:OPAQUE',
-            'BEGIN:VALARM','ACTION:DISPLAY',`DESCRIPTION:⏰ Your call with Winter is tomorrow at ${timeLabel}!`,'TRIGGER:-PT24H','END:VALARM',
-            'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:🔔 Your call with Winter starts in 30 minutes!','TRIGGER:-PT30M','END:VALARM',
-            'END:VEVENT','END:VCALENDAR'].join('\r\n');
+            `DTSTART:${local(start)}`,
+            `DTEND:${local(end)}`,
+            `SUMMARY:${icsEsc(`📅 Call with ${CFG.brand} — ${topic}`)}`,
+            `DESCRIPTION:${icsEsc(`Hi ${name}!\n\nYour call with ${CFG.brand} is confirmed.\nDate: ${dateStr}\nTime: ${timeLabel}\nTopic: ${topic}`)}`,
+            `ORGANIZER;CN=${CFG.brand}:mailto:${CFG.adminEmail}`,
+            `ATTENDEE;CN=${cn};RSVP=TRUE:mailto:${email}`,
+            'STATUS:CONFIRMED', 'TRANSP:OPAQUE',
+            'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(`⏰ Your call with ${CFG.brand} is tomorrow at ${timeLabel}!`)}`, 'TRIGGER:-PT24H', 'END:VALARM',
+            'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(`🔔 Your call with ${CFG.brand} starts in 30 minutes!`)}`, 'TRIGGER:-PT30M', 'END:VALARM',
+            'END:VEVENT', 'END:VCALENDAR'
+        ].join('\r\n');
     }
 
     function downloadICS(str, filename) {
         const blob = new Blob([str], { type: 'text/calendar;charset=utf-8' });
         const url  = URL.createObjectURL(blob);
         const link = document.getElementById('bmIcsDl');
-        link.href  = url;
+        link.href = url;
         link.download = filename;
         setTimeout(() => link.click(), 700);
     }
 
     async function sendEmails({ name, email, dateStr, timeLabel, topic, message }) {
+        if (!emailConfigured || !window.emailjs) throw new Error('EmailJS is not configured yet');
         await emailjs.send(CFG.serviceId, CFG.tplUser, {
             to_name: name, to_email: email, booking_date: dateStr,
             booking_time: timeLabel, booking_topic: topic,
@@ -1211,50 +1570,64 @@ const cy = containerScrolled + viewH / 2;
         });
     }
 
+    function failBooking(msg) {
+        bmSubmit.classList.remove('loading');
+        bmSubmit.disabled = false;
+        bmDbErrorMsg.textContent = msg;
+        bmDbError.classList.add('show');
+    }
+
     bmForm.addEventListener('submit', async e => {
         e.preventDefault();
         if (!validate()) return;
 
-        const name     = document.getElementById('bmName').value.trim();
-        const email    = document.getElementById('bmEmail').value.trim();
-        const topic    = document.getElementById('bmTopic').value || 'General Enquiry';
-        const message  = document.getElementById('bmMsg').value.trim();
-        const dateStr  = pickedDate.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+        const name    = document.getElementById('bmName').value.trim();
+        const email   = document.getElementById('bmEmail').value.trim();
+        const topic   = document.getElementById('bmTopic').value || 'General Enquiry';
+        const message = document.getElementById('bmMsg').value.trim();
+        const dateStr = fmtDate(pickedDate);
         const { label: timeLabel, h, m } = pickedSlot;
 
         bmSubmit.classList.add('loading');
         bmSubmit.disabled = true;
         bmDbError.classList.remove('show');
 
-        const { error: dbError } = await _supabase.from('bookings').insert([{ date: dateStr, time_slot: timeLabel, name, email, topic, message: message || null }]);
+        if (!_supabase) { failBooking('Booking is unavailable right now. Please email info@lunaxmarketing.com instead.'); return; }
 
+        const { error: dbError } = await _supabase.from('bookings').insert([{ date: dateStr, time_slot: timeLabel, name, email, topic, message: message || null }]);
         if (dbError) {
-            bmSubmit.classList.remove('loading');
-            bmSubmit.disabled = false;
-            bmDbErrorMsg.textContent = dbError.message.includes('duplicate')
+            failBooking(dbError.message.includes('duplicate')
                 ? 'That slot was just taken. Please pick another time.'
-                : 'Could not save your booking. Please try again.';
-            bmDbError.classList.add('show');
+                : 'Could not save your booking. Please try again.');
             loadBookedSlots(pickedDate);
             return;
         }
 
-        try { await sendEmails({ name, email, dateStr, timeLabel, topic, message }); }
-        catch (err) { console.warn('EmailJS error:', err); }
+        let emailsSent = false;
+        try { await sendEmails({ name, email, dateStr, timeLabel, topic, message }); emailsSent = true; }
+        catch (err) { console.warn('EmailJS:', err); }
 
-        const icsContent  = makeICS({ name, email, dateStr, timeLabel, topic, h, m, date: pickedDate });
-        const icsFilename  = `call-${name.split(' ')[0].toLowerCase()}-${pickedDate.toISOString().slice(0,10)}.ics`;
-        downloadICS(icsContent, icsFilename);
+        // Local date for the filename (toISOString() is UTC and gave the previous day in Pakistan)
+        const fileDate = `${pickedDate.getFullYear()}-${pad2(pickedDate.getMonth() + 1)}-${pad2(pickedDate.getDate())}`;
+        const firstName = (name.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '')) || 'guest';
+        downloadICS(makeICS({ name, email, dateStr, timeLabel, topic, h, m, date: pickedDate }), `call-${firstName}-${fileDate}.ics`);
+
+        // Only promise emails that were actually sent
+        document.getElementById('bmSuccessMsg').textContent = emailsSent
+            ? 'Confirmation emails are on their way. Download your calendar invite — the 24-hour and 30-minute alarms are already baked in.'
+            : 'Your slot is reserved. Download your calendar invite — the 24-hour and 30-minute alarms are already baked in.';
+        document.getElementById('bmEmailNote').style.display = emailsSent ? '' : 'none';
+        document.getElementById('bmAdminNote').style.display = emailsSent ? '' : 'none';
 
         bmFormWrap.style.display = 'none';
         bmSuccess.classList.add('show');
         document.getElementById('bmDetail').innerHTML =
-            `📅&nbsp; ${dateStr}<br>🕐&nbsp; ${timeLabel}<br>📌&nbsp; ${topic}<br>✉️&nbsp; ${email}`;
+            `📅&nbsp; ${escapeHtml(dateStr)}<br>🕐&nbsp; ${escapeHtml(timeLabel)}<br>📌&nbsp; ${escapeHtml(topic)}<br>✉️&nbsp; ${escapeHtml(email)}`;
 
         bmSubmit.classList.remove('loading');
         bmSubmit.disabled = false;
+        bmBooked = true;
     });
-
     </script>
 </body>
 </html>
