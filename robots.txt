@@ -1,0 +1,5 @@
+# Search engines and AI assistants (Google, Bing, ChatGPT, Claude, Perplexity, Gemini) may read the whole site
+User-agent: *
+Allow: /
+
+Sitemap: https://lunaxmarketing.vercel.app/sitemap.xml
